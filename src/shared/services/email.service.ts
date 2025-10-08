@@ -8,17 +8,16 @@ export const initializeEmailService = (): void => {
     service: "gmail",
     host: "smtp.gmail.com",
     port: 587,
-    secure: false,
-    requireTLS: true,
-    tls: {
-      rejectUnauthorized: false,
-      ciphers: "SSLv3",
-    },
+    secure: true,
     auth: {
       user: process.env.EMAIL_USER || "",
       pass: process.env.EMAIL_PASS || "",
     },
   });
+
+  console.log("Email service initialized");
+  console.log("Email user: ", process.env.EMAIL_USER);
+  console.log("Email pass: ", process.env.EMAIL_PASS);
 };
 
 export const sendMail = async (message: EmailMessage): Promise<EmailResult> => {
@@ -27,6 +26,14 @@ export const sendMail = async (message: EmailMessage): Promise<EmailResult> => {
   }
 
   try {
+    console.log("Sending email to: ", message.to);
+    console.log("Email subject: ", message.subject);
+    console.log("Email text: ", message.text);
+    console.log("Email html: ", message.html);
+    console.log(
+      "Email from: ",
+      process.env.EMAIL_FROM || process.env.EMAIL_USER
+    );
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
       to: message.to,
