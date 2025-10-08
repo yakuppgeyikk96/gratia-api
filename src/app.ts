@@ -18,6 +18,10 @@ app.use(express.urlencoded({ extended: true }));
 
 initializeEmailService();
 
+app.get("/health", (_req, res) => {
+  res.send({ status: "ok" });
+});
+
 routesConfig(app);
 
 const PORT = process.env.PORT || 3000;
