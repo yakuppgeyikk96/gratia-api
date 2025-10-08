@@ -1,7 +1,6 @@
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import "tsconfig-paths/register";
 import { connectDB, routesConfig, validateEnvironment } from "./config";
 import { initializeEmailService } from "./shared/services";
 

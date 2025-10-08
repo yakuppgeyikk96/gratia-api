@@ -1,5 +1,5 @@
-import { sendMail } from "@/shared/services/email.service";
-import { EmailResult } from "@/shared/types";
+import { sendMail } from "../../../shared/services/email.service";
+import { EmailResult } from "../../../shared/types";
 
 export const sendVerificationCodeByEmail = async (
   email: string,

@@ -1,5 +1,5 @@
-import { EmailMessage, EmailResult } from "@/shared/types";
 import { Transporter, createTransport } from "nodemailer";
+import { EmailMessage, EmailResult } from "../types";
 
 let transporter: Transporter | null = null;
 

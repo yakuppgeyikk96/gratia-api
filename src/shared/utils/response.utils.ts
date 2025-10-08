@@ -1,6 +1,6 @@
-import { IApiErrorResponse, IApiSuccessResponse } from "@/shared/types";
 import { Response } from "express";
 import { AppError, ErrorCode } from "../errors/base.errors";
+import { IApiErrorResponse, IApiSuccessResponse } from "../types";
 
 export const returnSuccess = <T>(
   res: Response,

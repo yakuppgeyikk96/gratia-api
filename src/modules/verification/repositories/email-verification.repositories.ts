@@ -1,6 +1,6 @@
 import EmailVerification, {
   EmailVerificationDoc,
-} from "@/shared/models/email-verification.model";
+} from "../../../shared/models/email-verification.model";
 import CreateVerificationDto from "../types/CreateVerificationDto";
 
 export const createEmailVerification = async (

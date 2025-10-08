@@ -1,14 +1,14 @@
-import { UserAlreadyExistsError } from "@/modules/user/errors";
-import { findUserByEmail } from "@/modules/user/repositories";
-import { SendingVerificationEmailError } from "@/modules/verification/errors";
-import { createEmailVerification } from "@/modules/verification/repositories";
-import { sendVerificationCodeByEmail as sendVerificationCodeByEmailService } from "@/modules/verification/services/email-verification.services";
-import { EMAIL_VERIFICATION_EXPIRATION_TIME } from "@/shared/constants/expiration.constants";
-import { encrypt } from "@/shared/utils/encryption.utils";
+import { UserAlreadyExistsError } from "../../../modules/user/errors";
+import { findUserByEmail } from "../../../modules/user/repositories";
+import { SendingVerificationEmailError } from "../../../modules/verification/errors";
+import { createEmailVerification } from "../../../modules/verification/repositories";
+import { sendVerificationCodeByEmail as sendVerificationCodeByEmailService } from "../../../modules/verification/services/email-verification.services";
+import { EMAIL_VERIFICATION_EXPIRATION_TIME } from "../../../shared/constants/expiration.constants";
+import { encrypt } from "../../../shared/utils/encryption.utils";
 import {
   generateUniqueToken,
   generateVerificationCode,
-} from "@/shared/utils/token.utils";
+} from "../../../shared/utils/token.utils";
 import {
   SendVerificationCodeByEmailDto,
   SendVerificationCodeByEmailResult,

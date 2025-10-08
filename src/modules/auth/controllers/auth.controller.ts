@@ -1,6 +1,6 @@
-import { asyncHandler } from "@/shared/middlewares";
-import { returnSuccess } from "@/shared/utils/response.utils";
 import { Request, Response } from "express";
+import { asyncHandler } from "../../../shared/middlewares";
+import { returnSuccess } from "../../../shared/utils/response.utils";
 import { AUTH_MESSAGES } from "../constants";
 import { sendVerificationCodeByEmail } from "../services/auth.services";
 import { SendVerificationCodeByEmailDto } from "../types";

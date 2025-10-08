@@ -1,5 +1,5 @@
-import { validateBody } from "@/shared/middlewares/validation.middleware";
 import { Router } from "express";
+import { validateBody } from "../../../shared/middlewares/validation.middleware";
 import { verifyEmail } from "../controllers/auth.controller";
 import { verifyEmailSchema } from "../validations/auth.validations";
 

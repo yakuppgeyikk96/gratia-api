@@ -1,4 +1,4 @@
-import { AppError } from "@/shared/errors/base.errors";
+import { AppError } from "../../../shared/errors/base.errors";
 
 export enum UserErrorCode {
   USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS",

@@ -1,4 +1,4 @@
-import { AppError } from "@/shared/errors/base.errors";
+import { AppError } from "../../../shared/errors/base.errors";
 
 export enum EmailVerificationErrorCode {
   SENDING_VERIFICATION_CODE_FAILED = "SENDING_VERIFICATION_CODE_FAILED",

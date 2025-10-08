@@ -1,5 +1,5 @@
-import authRoutes from "@/modules/auth/routes/auth.routes";
 import { Express, Router } from "express";
+import authRoutes from "../modules/auth/routes/auth.routes";
 
 const basePath = "/api";
 

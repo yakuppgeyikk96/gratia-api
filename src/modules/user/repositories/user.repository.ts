@@ -1,6 +1,6 @@
-import { BCRYPT_ROUNDS } from "@/shared/constants/crypto.constants";
-import User, { UserDoc } from "@/shared/models/user.model";
 import bcrypt from "bcryptjs";
+import { BCRYPT_ROUNDS } from "../../../shared/constants/crypto.constants";
+import User, { UserDoc } from "../../../shared/models/user.model";
 import CreateUserDto from "../types/CreateUserDto";
 
 export const createUser = async (userData: CreateUserDto): Promise<UserDoc> => {
