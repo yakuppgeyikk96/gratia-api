@@ -27,6 +27,7 @@
     "pnpm": ">=8.0.0"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
@@ -35,14 +36,12 @@
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.2",
-    "nodemailer": "^7.0.9",
     "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.2",
-    "@types/nodemailer": "^7.0.2",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.10",
     "picocolors": "^1.1.1",

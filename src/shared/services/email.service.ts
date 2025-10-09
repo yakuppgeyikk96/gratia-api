@@ -1,58 +1,37 @@
-import { Transporter, createTransport } from "nodemailer";
+import sgMail from "@sendgrid/mail";
 import { EmailMessage, EmailResult } from "../types";
 
-let transporter: Transporter | null = null;
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const EMAIL_FROM = process.env.EMAIL_FROM;
+
+if (!SENDGRID_API_KEY || !EMAIL_FROM) {
+  throw new Error("SENDGRID_API_KEY is not set");
+}
 
 export const initializeEmailService = (): void => {
-  transporter = createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER || "",
-      pass: process.env.EMAIL_PASS || "",
-    },
-  });
-
-  console.log("Email service initialized");
-  console.log("Email user: ", process.env.EMAIL_USER);
-  console.log("Email pass: ", process.env.EMAIL_PASS);
+  sgMail.setApiKey(SENDGRID_API_KEY);
 };
 
 export const sendMail = async (message: EmailMessage): Promise<EmailResult> => {
-  if (!transporter) {
-    throw new Error("Email service not initialized");
-  }
-
   try {
-    console.log("Sending email to: ", message.to);
-    console.log("Email subject: ", message.subject);
-    console.log("Email text: ", message.text);
-    console.log("Email html: ", message.html);
-    console.log(
-      "Email from: ",
-      process.env.EMAIL_FROM || process.env.EMAIL_USER
-    );
+    console.log("Sending email to:", message.to);
 
-    await Promise.race([
-      transporter.sendMail({
-        from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-        to: message.to,
-        subject: message.subject,
-        text: message.text,
-        html: message.html,
-      }),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Email sending timeout")), 30000)
-      ),
-    ]);
+    const result = await sgMail.send({
+      to: message.to,
+      from: EMAIL_FROM,
+      subject: message.subject,
+      text: message.text,
+      html: message.html,
+    });
+
+    console.log("Email sent successfully");
 
     return {
       success: true,
-      messageId: `msg_${Date.now()}`,
+      messageId: result[0].headers["x-message-id"] || "unknown",
     };
   } catch (error) {
+    console.error("Email sending failed:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
