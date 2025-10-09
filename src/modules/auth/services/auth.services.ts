@@ -1,10 +1,24 @@
-import { UserAlreadyExistsError } from "../../../modules/user/errors";
-import { findUserByEmail } from "../../../modules/user/repositories";
-import { SendingVerificationEmailError } from "../../../modules/verification/errors";
-import { createEmailVerification } from "../../../modules/verification/repositories";
+import {
+  UserAlreadyExistsError,
+  UserCreationFailedError,
+} from "../../../modules/user/errors";
+import {
+  createUser,
+  findUserByEmail,
+} from "../../../modules/user/repositories";
+import { createUserSchema } from "../../../modules/user/validations";
+import {
+  EmailVerificationFailedError,
+  SendingVerificationEmailError,
+} from "../../../modules/verification/errors";
+import {
+  createEmailVerification,
+  verifyEmailCode,
+} from "../../../modules/verification/repositories";
 import { sendVerificationCodeByEmail as sendVerificationCodeByEmailService } from "../../../modules/verification/services/email-verification.services";
 import { EMAIL_VERIFICATION_EXPIRATION_TIME } from "../../../shared/constants/expiration.constants";
-import { encrypt } from "../../../shared/utils/encryption.utils";
+import { decrypt, encrypt } from "../../../shared/utils/encryption.utils";
+import { generateJwtToken } from "../../../shared/utils/jwt.utils";
 import {
   generateUniqueToken,
   generateVerificationCode,
@@ -13,6 +27,8 @@ import {
   SendVerificationCodeByEmailDto,
   SendVerificationCodeByEmailResult,
 } from "../types";
+import { RegisterUserDto } from "../types/RegisterUserDto";
+import { RegisterUserResult } from "../types/RegisterUserResult";
 
 export const sendVerificationCodeByEmail = async (
   data: SendVerificationCodeByEmailDto
@@ -22,7 +38,7 @@ export const sendVerificationCodeByEmail = async (
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
-    throw new UserAlreadyExistsError("User already exists");
+    throw new UserAlreadyExistsError(email);
   }
 
   const verificationCode = generateVerificationCode();
@@ -38,9 +54,7 @@ export const sendVerificationCodeByEmail = async (
   );
 
   if (!sendingEmailResult.success) {
-    throw new SendingVerificationEmailError(
-      sendingEmailResult.error || "Failed to send verification code"
-    );
+    throw new SendingVerificationEmailError();
   }
 
   await createEmailVerification({
@@ -52,4 +66,37 @@ export const sendVerificationCodeByEmail = async (
   });
 
   return { token };
+};
+
+export const registerUser = async (
+  data: RegisterUserDto
+): Promise<RegisterUserResult> => {
+  const { token, code } = data;
+
+  const verifiedEmailData = await verifyEmailCode(token, code);
+
+  if (!verifiedEmailData) {
+    throw new EmailVerificationFailedError();
+  }
+
+  const decryptedUserData = decrypt(verifiedEmailData.encryptedUserData);
+
+  const userData = JSON.parse(decryptedUserData);
+
+  const validatedUserData = createUserSchema.parse(userData);
+
+  const user = await createUser(validatedUserData);
+
+  if (!user) {
+    throw new UserCreationFailedError();
+  }
+
+  const jwtToken = await generateJwtToken({
+    userId: user._id.toString(),
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  });
+
+  return { user, token: jwtToken };
 };

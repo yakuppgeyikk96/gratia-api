@@ -4,8 +4,12 @@ import { EmailMessage, EmailResult } from "../types";
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const EMAIL_FROM = process.env.EMAIL_FROM;
 
-if (!SENDGRID_API_KEY || !EMAIL_FROM) {
+if (!SENDGRID_API_KEY) {
   throw new Error("SENDGRID_API_KEY is not set");
+}
+
+if (!EMAIL_FROM) {
+  throw new Error("EMAIL_FROM is not set");
 }
 
 export const initializeEmailService = (): void => {

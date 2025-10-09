@@ -21,7 +21,7 @@
   ],
   "author": "Your Name",
   "license": "ISC",
-  "packageManager": "pnpm@10.16.0",
+  "packageManager": "pnpm@10.18.1",
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"

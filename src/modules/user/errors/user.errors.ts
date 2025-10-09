@@ -9,6 +9,7 @@ export enum UserErrorCode {
   TOKEN_EXPIRED = "TOKEN_EXPIRED",
   TOKEN_INVALID = "TOKEN_INVALID",
   INVALID_VERIFICATION_CODE = "INVALID_VERIFICATION_CODE",
+  USER_CREATION_FAILED = "USER_CREATION_FAILED",
 }
 
 export class UserAlreadyExistsError extends AppError {
@@ -17,6 +18,16 @@ export class UserAlreadyExistsError extends AppError {
       `User with email ${email} already exists`,
       UserErrorCode.USER_ALREADY_EXISTS as any,
       409
+    );
+  }
+}
+
+export class UserCreationFailedError extends AppError {
+  constructor() {
+    super(
+      "User creation failed due to an unknown error",
+      UserErrorCode.USER_CREATION_FAILED as any,
+      500
     );
   }
 }
