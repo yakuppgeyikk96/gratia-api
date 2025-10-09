@@ -34,13 +34,19 @@ export const sendMail = async (message: EmailMessage): Promise<EmailResult> => {
       "Email from: ",
       process.env.EMAIL_FROM || process.env.EMAIL_USER
     );
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-      to: message.to,
-      subject: message.subject,
-      text: message.text,
-      html: message.html,
-    });
+
+    await Promise.race([
+      transporter.sendMail({
+        from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+        to: message.to,
+        subject: message.subject,
+        text: message.text,
+        html: message.html,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Email sending timeout")), 30000)
+      ),
+    ]);
 
     return {
       success: true,
