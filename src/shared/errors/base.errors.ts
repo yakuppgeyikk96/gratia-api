@@ -5,6 +5,7 @@ export enum ErrorCode {
   NOT_FOUND = "NOT_FOUND",
   CONFLICT = "CONFLICT",
   VALIDATION_ERROR = "VALIDATION_ERROR",
+  INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
 }
 
 export class AppError extends Error {

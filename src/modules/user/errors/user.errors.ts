@@ -12,6 +12,16 @@ export enum UserErrorCode {
   USER_CREATION_FAILED = "USER_CREATION_FAILED",
 }
 
+export class UserNotFoundError extends AppError {
+  constructor(email: string) {
+    super(
+      `User with email ${email} not found`,
+      UserErrorCode.USER_NOT_FOUND as any,
+      404
+    );
+  }
+}
+
 export class UserAlreadyExistsError extends AppError {
   constructor(email: string) {
     super(

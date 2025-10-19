@@ -1,6 +1,8 @@
+import bcrypt from "bcryptjs";
 import {
   UserAlreadyExistsError,
   UserCreationFailedError,
+  UserNotFoundError,
 } from "../../../modules/user/errors";
 import {
   createUser,
@@ -17,6 +19,7 @@ import {
 } from "../../../modules/verification/repositories";
 import { sendVerificationCodeByEmail as sendVerificationCodeByEmailService } from "../../../modules/verification/services/email-verification.services";
 import { EMAIL_VERIFICATION_EXPIRATION_TIME } from "../../../shared/constants/expiration.constants";
+import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import { decrypt, encrypt } from "../../../shared/utils/encryption.utils";
 import { generateJwtToken } from "../../../shared/utils/jwt.utils";
 import {
@@ -27,6 +30,8 @@ import {
   SendVerificationCodeByEmailDto,
   SendVerificationCodeByEmailResult,
 } from "../types";
+import { LoginUserDto } from "../types/LoginUserDto";
+import { LoginUserResult } from "../types/LoginUserResult";
 import { RegisterUserDto } from "../types/RegisterUserDto";
 import { RegisterUserResult } from "../types/RegisterUserResult";
 
@@ -89,6 +94,33 @@ export const registerUser = async (
 
   if (!user) {
     throw new UserCreationFailedError();
+  }
+
+  const jwtToken = await generateJwtToken({
+    userId: user._id.toString(),
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  });
+
+  return { user, token: jwtToken };
+};
+
+export const loginUser = async (
+  data: LoginUserDto
+): Promise<LoginUserResult> => {
+  const { email, password } = data;
+
+  const user = await findUserByEmail(email);
+
+  if (!user) {
+    throw new UserNotFoundError(email);
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw new AppError("Invalid credentials", ErrorCode.INVALID_CREDENTIALS);
   }
 
   const jwtToken = await generateJwtToken({
