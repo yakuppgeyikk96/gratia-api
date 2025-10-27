@@ -1,0 +1,18 @@
+export const PRODUCT_MESSAGES = {
+  PRODUCT_NOT_FOUND: "Product not found",
+  PRODUCT_SLUG_ALREADY_EXISTS: "Product with this slug already exists",
+  PRODUCT_SKU_ALREADY_EXISTS: "Product with this SKU already exists",
+  PRODUCT_ID_REQUIRED: "Product ID is required",
+  PRODUCT_SLUG_REQUIRED: "Product slug is required",
+  PRODUCT_CREATION_FAILED: "Failed to create product",
+  PRODUCT_CREATED: "Product created successfully",
+  PRODUCT_FOUND: "Product retrieved successfully",
+  PRODUCTS_FOUND: "Products retrieved successfully",
+  PRODUCT_UPDATED: "Product updated successfully",
+  PRODUCT_DELETED: "Product deleted successfully",
+  CATEGORY_NOT_FOUND: "Category not found",
+  COLLECTION_NOT_FOUND: "Collection not found",
+  CATEGORY_ID_REQUIRED: "Category ID is required",
+  COLLECTION_ID_REQUIRED: "Collection ID is required",
+  CATEGORY_SLUG_REQUIRED: "Category slug is required",
+} as const;
