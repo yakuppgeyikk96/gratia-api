@@ -3,6 +3,7 @@ import authRoutes from "../modules/auth/routes/auth.routes";
 import categoryRoutes from "../modules/category/routes/category.routes";
 import collectionRoutes from "../modules/collection/routes/collection.routes";
 import productRoutes from "../modules/product/routes/product.routes";
+import seedRoutes from "../modules/seed/routes/seed.routes";
 
 const basePath = "/api";
 
@@ -13,6 +14,7 @@ export const routesConfig = (app: Express) => {
   router.use("/categories", categoryRoutes);
   router.use("/collections", collectionRoutes);
   router.use("/products", productRoutes);
+  router.use("/seed", seedRoutes);
 
   app.use(`${basePath}`, router);
 };

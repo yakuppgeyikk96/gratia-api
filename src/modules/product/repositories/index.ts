@@ -1,15 +1,9 @@
 export {
   createProduct,
-  findActiveProducts,
-  findActiveProductsWithDetails,
-  findAllProducts,
-  findAllProductsWithDetails,
+  extractFilterOptions,
   findProductById,
   findProductByIdWithDetails,
   findProductBySku,
   findProductBySlug,
-  findProductBySlugWithDetails,
-  findProductByVariantSku,
-  findProductsByCategory,
-  findProductsByCollection,
+  findProducts,
 } from "./product.repository";

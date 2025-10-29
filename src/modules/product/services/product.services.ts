@@ -1,24 +1,20 @@
 import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import { ProductDoc } from "../../../shared/models/product.model";
 import { findCategoryById } from "../../category/repositories/category.repository";
-import { findCollectionById } from "../../collection/repositories/collection.repository";
+import { findCollectionBySlug } from "../../collection/repositories/collection.repository";
 import { PRODUCT_MESSAGES } from "../constants/product.constants";
 import {
   createProduct,
-  findActiveProducts,
-  findActiveProductsWithDetails,
-  findAllProducts,
-  findAllProductsWithDetails,
+  extractFilterOptions,
   findProductById,
   findProductByIdWithDetails,
   findProductBySku,
   findProductBySlug,
-  findProductBySlugWithDetails,
-  findProductsByCategory,
-  findProductsByCategoryPath,
-  findProductsByCollection,
-} from "../repositories/product.repository";
+  findProducts,
+} from "../repositories";
 import CreateProductDto from "../types/CreateProductDto";
+import ProductQueryOptionsDto from "../types/ProductQueryOptionsDto";
+import ProductsResponseDto from "../types/ProductsResponseDto";
 
 export const createProductService = async (
   data: CreateProductDto
@@ -63,12 +59,12 @@ export const createProductService = async (
    * Check if the collections exist
    * If they don't, throw an error
    */
-  if (data.collectionIds && data.collectionIds.length > 0) {
-    for (const collectionId of data.collectionIds) {
-      const collection = await findCollectionById(collectionId);
+  if (data.collectionSlugs && data.collectionSlugs.length > 0) {
+    for (const collectionSlug of data.collectionSlugs) {
+      const collection = await findCollectionBySlug(collectionSlug);
       if (!collection) {
         throw new AppError(
-          PRODUCT_MESSAGES.COLLECTION_NOT_FOUND,
+          `Collection with slug '${collectionSlug}' not found`,
           ErrorCode.NOT_FOUND
         );
       }
@@ -90,30 +86,39 @@ export const createProductService = async (
   return product;
 };
 
-export const getAllProductsService = async (
+export const getProductsService = async (
+  options: ProductQueryOptionsDto,
   withDetails = false
-): Promise<ProductDoc[]> => {
-  /**
-   * If withDetails is true, return all products with details
-   * Otherwise, return all products
-   */
-  if (withDetails) {
-    return await findAllProductsWithDetails();
+): Promise<ProductsResponseDto> => {
+  if (!options.categorySlug && !options.collectionSlug) {
+    throw new AppError(
+      PRODUCT_MESSAGES.CATEGORY_OR_COLLECTION_REQUIRED,
+      ErrorCode.BAD_REQUEST
+    );
   }
-  return await findAllProducts();
-};
 
-export const getActiveProductsService = async (
-  withDetails = false
-): Promise<ProductDoc[]> => {
-  /**
-   * If withDetails is true, return all active products with details
-   * Otherwise, return all active products
-   */
-  if (withDetails) {
-    return await findActiveProductsWithDetails();
-  }
-  return await findActiveProducts();
+  const { products, total } = await findProducts(options, withDetails);
+
+  const filterOptions = await extractFilterOptions(
+    options.categorySlug,
+    options.collectionSlug
+  );
+
+  const page = options.page || 1;
+  const limit = options.limit || 10;
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    products,
+    filters: filterOptions,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages,
+    },
+    sortOptions: ["newest", "price-low", "price-high", "name"],
+  };
 };
 
 export const getProductByIdService = async (
@@ -133,47 +138,4 @@ export const getProductByIdService = async (
   }
 
   return product;
-};
-
-export const getProductBySlugService = async (
-  slug: string,
-  withDetails = false
-): Promise<ProductDoc> => {
-  /**
-   * If withDetails is true, return the product with details
-   * Otherwise, return the product
-   */
-  const product = withDetails
-    ? await findProductBySlugWithDetails(slug)
-    : await findProductBySlug(slug);
-
-  if (!product) {
-    throw new AppError(PRODUCT_MESSAGES.PRODUCT_NOT_FOUND, ErrorCode.NOT_FOUND);
-  }
-
-  return product;
-};
-
-export const getProductsByCategoryService = async (
-  categoryId: string
-): Promise<ProductDoc[]> => {
-  /**
-   * Return all products by category
-   */
-  return await findProductsByCategory(categoryId);
-};
-
-export const getProductsByCollectionService = async (
-  collectionId: string
-): Promise<ProductDoc[]> => {
-  /**
-   * Return all products by collection
-   */
-  return await findProductsByCollection(collectionId);
-};
-
-export const getProductsByCategoryPathService = async (
-  categorySlug: string
-): Promise<ProductDoc[]> => {
-  return await findProductsByCategoryPath(categorySlug);
 };

@@ -1,0 +1,367 @@
+{
+  "success": true,
+  "message": "Categories retrieved successfully",
+  "data": [
+    {
+      "_id": "69025076eae220e59a3bb188",
+      "name": "Men",
+      "slug": "men",
+      "parentId": null,
+      "level": 0,
+      "isActive": true,
+      "sortOrder": 1,
+      "createdAt": "2025-10-29T17:35:50.001Z",
+      "updatedAt": "2025-10-29T17:35:50.001Z",
+      "__v": 0,
+      "children": [
+        {
+          "_id": "69025076eae220e59a3bb18e",
+          "name": "Clothing",
+          "slug": "men-clothing",
+          "parentId": "69025076eae220e59a3bb188",
+          "level": 1,
+          "isActive": true,
+          "sortOrder": 1,
+          "createdAt": "2025-10-29T17:35:50.488Z",
+          "updatedAt": "2025-10-29T17:35:50.488Z",
+          "__v": 0,
+          "children": [
+            {
+              "_id": "69025077eae220e59a3bb19a",
+              "name": "Jackets",
+              "slug": "men-clothing-jackets",
+              "parentId": "69025076eae220e59a3bb18e",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 1,
+              "createdAt": "2025-10-29T17:35:51.454Z",
+              "updatedAt": "2025-10-29T17:35:51.454Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025077eae220e59a3bb19c",
+              "name": "T-Shirts",
+              "slug": "men-clothing-t-shirts",
+              "parentId": "69025076eae220e59a3bb18e",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 2,
+              "createdAt": "2025-10-29T17:35:51.614Z",
+              "updatedAt": "2025-10-29T17:35:51.614Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025077eae220e59a3bb19e",
+              "name": "Jeans",
+              "slug": "men-clothing-jeans",
+              "parentId": "69025076eae220e59a3bb18e",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 3,
+              "createdAt": "2025-10-29T17:35:51.773Z",
+              "updatedAt": "2025-10-29T17:35:51.773Z",
+              "__v": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "_id": "69025076eae220e59a3bb190",
+          "name": "Shoes",
+          "slug": "men-shoes",
+          "parentId": "69025076eae220e59a3bb188",
+          "level": 1,
+          "isActive": true,
+          "sortOrder": 2,
+          "createdAt": "2025-10-29T17:35:50.649Z",
+          "updatedAt": "2025-10-29T17:35:50.649Z",
+          "__v": 0,
+          "children": [
+            {
+              "_id": "69025077eae220e59a3bb1a0",
+              "name": "Sneakers",
+              "slug": "men-shoes-sneakers",
+              "parentId": "69025076eae220e59a3bb190",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 1,
+              "createdAt": "2025-10-29T17:35:51.933Z",
+              "updatedAt": "2025-10-29T17:35:51.933Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025078eae220e59a3bb1a2",
+              "name": "Boots",
+              "slug": "men-shoes-boots",
+              "parentId": "69025076eae220e59a3bb190",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 2,
+              "createdAt": "2025-10-29T17:35:52.093Z",
+              "updatedAt": "2025-10-29T17:35:52.093Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025078eae220e59a3bb1a4",
+              "name": "Sandals",
+              "slug": "men-shoes-sandals",
+              "parentId": "69025076eae220e59a3bb190",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 3,
+              "createdAt": "2025-10-29T17:35:52.254Z",
+              "updatedAt": "2025-10-29T17:35:52.254Z",
+              "__v": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_id": "69025076eae220e59a3bb18a",
+      "name": "Women",
+      "slug": "women",
+      "parentId": null,
+      "level": 0,
+      "isActive": true,
+      "sortOrder": 2,
+      "createdAt": "2025-10-29T17:35:50.165Z",
+      "updatedAt": "2025-10-29T17:35:50.165Z",
+      "__v": 0,
+      "children": [
+        {
+          "_id": "69025076eae220e59a3bb192",
+          "name": "Clothing",
+          "slug": "women-clothing",
+          "parentId": "69025076eae220e59a3bb18a",
+          "level": 1,
+          "isActive": true,
+          "sortOrder": 1,
+          "createdAt": "2025-10-29T17:35:50.811Z",
+          "updatedAt": "2025-10-29T17:35:50.811Z",
+          "__v": 0,
+          "children": [
+            {
+              "_id": "69025078eae220e59a3bb1a6",
+              "name": "Jackets",
+              "slug": "women-clothing-jackets",
+              "parentId": "69025076eae220e59a3bb192",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 1,
+              "createdAt": "2025-10-29T17:35:52.416Z",
+              "updatedAt": "2025-10-29T17:35:52.416Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025078eae220e59a3bb1a8",
+              "name": "T-Shirts",
+              "slug": "women-clothing-t-shirts",
+              "parentId": "69025076eae220e59a3bb192",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 2,
+              "createdAt": "2025-10-29T17:35:52.576Z",
+              "updatedAt": "2025-10-29T17:35:52.576Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025078eae220e59a3bb1aa",
+              "name": "Jeans",
+              "slug": "women-clothing-jeans",
+              "parentId": "69025076eae220e59a3bb192",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 3,
+              "createdAt": "2025-10-29T17:35:52.737Z",
+              "updatedAt": "2025-10-29T17:35:52.737Z",
+              "__v": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "_id": "69025076eae220e59a3bb194",
+          "name": "Shoes",
+          "slug": "women-shoes",
+          "parentId": "69025076eae220e59a3bb18a",
+          "level": 1,
+          "isActive": true,
+          "sortOrder": 2,
+          "createdAt": "2025-10-29T17:35:50.971Z",
+          "updatedAt": "2025-10-29T17:35:50.971Z",
+          "__v": 0,
+          "children": [
+            {
+              "_id": "69025078eae220e59a3bb1ac",
+              "name": "Sneakers",
+              "slug": "women-shoes-sneakers",
+              "parentId": "69025076eae220e59a3bb194",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 1,
+              "createdAt": "2025-10-29T17:35:52.898Z",
+              "updatedAt": "2025-10-29T17:35:52.898Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025079eae220e59a3bb1ae",
+              "name": "Boots",
+              "slug": "women-shoes-boots",
+              "parentId": "69025076eae220e59a3bb194",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 2,
+              "createdAt": "2025-10-29T17:35:53.058Z",
+              "updatedAt": "2025-10-29T17:35:53.058Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025079eae220e59a3bb1b0",
+              "name": "Sandals",
+              "slug": "women-shoes-sandals",
+              "parentId": "69025076eae220e59a3bb194",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 3,
+              "createdAt": "2025-10-29T17:35:53.231Z",
+              "updatedAt": "2025-10-29T17:35:53.231Z",
+              "__v": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_id": "69025076eae220e59a3bb18c",
+      "name": "Kids",
+      "slug": "kids",
+      "parentId": null,
+      "level": 0,
+      "isActive": true,
+      "sortOrder": 3,
+      "createdAt": "2025-10-29T17:35:50.326Z",
+      "updatedAt": "2025-10-29T17:35:50.326Z",
+      "__v": 0,
+      "children": [
+        {
+          "_id": "69025077eae220e59a3bb196",
+          "name": "Clothing",
+          "slug": "kids-clothing",
+          "parentId": "69025076eae220e59a3bb18c",
+          "level": 1,
+          "isActive": true,
+          "sortOrder": 1,
+          "createdAt": "2025-10-29T17:35:51.132Z",
+          "updatedAt": "2025-10-29T17:35:51.132Z",
+          "__v": 0,
+          "children": [
+            {
+              "_id": "69025079eae220e59a3bb1b2",
+              "name": "Jackets",
+              "slug": "kids-clothing-jackets",
+              "parentId": "69025077eae220e59a3bb196",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 1,
+              "createdAt": "2025-10-29T17:35:53.392Z",
+              "updatedAt": "2025-10-29T17:35:53.392Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025079eae220e59a3bb1b4",
+              "name": "T-Shirts",
+              "slug": "kids-clothing-t-shirts",
+              "parentId": "69025077eae220e59a3bb196",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 2,
+              "createdAt": "2025-10-29T17:35:53.553Z",
+              "updatedAt": "2025-10-29T17:35:53.553Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "69025079eae220e59a3bb1b6",
+              "name": "Jeans",
+              "slug": "kids-clothing-jeans",
+              "parentId": "69025077eae220e59a3bb196",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 3,
+              "createdAt": "2025-10-29T17:35:53.713Z",
+              "updatedAt": "2025-10-29T17:35:53.713Z",
+              "__v": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "_id": "69025077eae220e59a3bb198",
+          "name": "Shoes",
+          "slug": "kids-shoes",
+          "parentId": "69025076eae220e59a3bb18c",
+          "level": 1,
+          "isActive": true,
+          "sortOrder": 2,
+          "createdAt": "2025-10-29T17:35:51.292Z",
+          "updatedAt": "2025-10-29T17:35:51.292Z",
+          "__v": 0,
+          "children": [
+            {
+              "_id": "69025079eae220e59a3bb1b8",
+              "name": "Sneakers",
+              "slug": "kids-shoes-sneakers",
+              "parentId": "69025077eae220e59a3bb198",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 1,
+              "createdAt": "2025-10-29T17:35:53.874Z",
+              "updatedAt": "2025-10-29T17:35:53.874Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "6902507aeae220e59a3bb1ba",
+              "name": "Boots",
+              "slug": "kids-shoes-boots",
+              "parentId": "69025077eae220e59a3bb198",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 2,
+              "createdAt": "2025-10-29T17:35:54.034Z",
+              "updatedAt": "2025-10-29T17:35:54.034Z",
+              "__v": 0,
+              "children": []
+            },
+            {
+              "_id": "6902507aeae220e59a3bb1bc",
+              "name": "Sandals",
+              "slug": "kids-shoes-sandals",
+              "parentId": "69025077eae220e59a3bb198",
+              "level": 2,
+              "isActive": true,
+              "sortOrder": 3,
+              "createdAt": "2025-10-29T17:35:54.195Z",
+              "updatedAt": "2025-10-29T17:35:54.195Z",
+              "__v": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timestamp": "2025-10-29T17:36:40.995Z"
+}

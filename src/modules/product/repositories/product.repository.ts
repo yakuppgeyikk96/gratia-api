@@ -1,6 +1,8 @@
+import { FilterQuery } from "mongoose";
 import Category, { CategoryDoc } from "../../../shared/models/category.model";
 import Product, { ProductDoc } from "../../../shared/models/product.model";
 import { CreateProductDto } from "../types";
+import ProductQueryOptionsDto from "../types/ProductQueryOptionsDto";
 
 export const buildCategoryPath = async (
   categoryId: string
@@ -39,6 +41,159 @@ export const createProduct = async (
   return await product.save();
 };
 
+export const findProducts = async (
+  options: ProductQueryOptionsDto,
+  withDetails: boolean = false
+): Promise<{ products: ProductDoc[]; total: number }> => {
+  const {
+    categorySlug,
+    collectionSlug,
+    filters,
+    sort = "newest",
+    page = 1,
+    limit = 10,
+  } = options;
+
+  const query: FilterQuery<ProductDoc> = {
+    isActive: true,
+  };
+
+  if (categorySlug) {
+    query.categoryPath = new RegExp(`^${categorySlug.replace(/#/g, "#")}`);
+  }
+
+  if (collectionSlug) {
+    query.collectionSlugs = collectionSlug;
+  }
+
+  /**
+   * Variant Filters
+   */
+  if (
+    filters &&
+    (filters.colors || filters.sizes || filters.brands || filters.materials)
+  ) {
+    query.$or = [];
+
+    if (
+      filters.colors ||
+      filters.sizes ||
+      filters.brands ||
+      filters.materials
+    ) {
+      query["variants"] = {
+        $elemMatch: {
+          ...(filters.colors && {
+            "attributes.color": { $in: filters.colors },
+          }),
+          ...(filters.sizes && { "attributes.size": { $in: filters.sizes } }),
+          ...(filters.brands && {
+            "attributes.brand": { $in: filters.brands },
+          }),
+          ...(filters.materials && {
+            "attributes.material": { $in: filters.materials },
+          }),
+        },
+      };
+    }
+  }
+
+  /**
+   * Price Filters
+   */
+  if (filters && (filters.minPrice || filters.maxPrice)) {
+    query.basePrice = {};
+    if (filters.minPrice) query.basePrice.$gte = filters.minPrice;
+    if (filters.maxPrice) query.basePrice.$lte = filters.maxPrice;
+  }
+
+  // Sorting
+  let sortQuery: any = {};
+  switch (sort) {
+    case "newest":
+      sortQuery = { createdAt: -1 };
+      break;
+    case "price-low":
+      sortQuery = { basePrice: 1 };
+      break;
+    case "price-high":
+      sortQuery = { basePrice: -1 };
+      break;
+    case "name":
+      sortQuery = { name: 1 };
+      break;
+    default:
+      sortQuery = { createdAt: -1 };
+  }
+
+  /**
+   * Pagination
+   */
+  const skip = (page - 1) * limit;
+
+  let queryBuilder = Product.find(query);
+
+  if (withDetails) {
+    queryBuilder = queryBuilder.populate("categoryId", "name slug description");
+  }
+
+  const [products, total] = await Promise.all([
+    queryBuilder.sort(sortQuery).skip(skip).limit(limit).exec(),
+    Product.countDocuments(query),
+  ]);
+
+  return { products, total };
+};
+
+export const extractFilterOptions = async (
+  categorySlug?: string,
+  collectionSlug?: string
+): Promise<any> => {
+  const query: any = { isActive: true };
+
+  if (categorySlug) {
+    query.categoryPath = new RegExp(`^${categorySlug.replace(/#/g, "#")}`);
+  }
+
+  if (collectionSlug) {
+    query.collectionSlugs = collectionSlug;
+  }
+
+  const products = await Product.find(query);
+
+  const colors = new Set<string>();
+  const sizes = new Set<string>();
+  const brands = new Set<string>();
+  const materials = new Set<string>();
+  const prices: number[] = [];
+
+  products.forEach((product) => {
+    prices.push(product.basePrice);
+    if (product.baseDiscountedPrice) {
+      prices.push(product.baseDiscountedPrice);
+    }
+
+    product.variants.forEach((variant) => {
+      if (variant.attributes.color) colors.add(variant.attributes.color);
+      if (variant.attributes.size) sizes.add(variant.attributes.size);
+      if (variant.attributes.brand) brands.add(variant.attributes.brand);
+      if (variant.attributes.material)
+        materials.add(variant.attributes.material);
+    });
+  });
+
+  return {
+    colors: Array.from(colors).sort(),
+    sizes: Array.from(sizes).sort(),
+    brands: Array.from(brands).sort(),
+    materials: Array.from(materials).sort(),
+    priceRange: {
+      min: prices.length > 0 ? Math.min(...prices) : 0,
+      max: prices.length > 0 ? Math.max(...prices) : 0,
+    },
+  };
+};
+
 export const findProductBySlug = async (
   slug: string
 ): Promise<ProductDoc | null> => {
@@ -54,75 +209,14 @@ export const findProductById = async (
 export const findProductByIdWithDetails = async (
   id: string
 ): Promise<ProductDoc | null> => {
-  return await Product.findById(id)
-    .populate("categoryId", "name slug description")
-    .populate("collectionIds", "name slug collectionType");
-};
-
-export const findProductBySlugWithDetails = async (
-  slug: string
-): Promise<ProductDoc | null> => {
-  return await Product.findOne({ slug: slug.toLowerCase() })
-    .populate("categoryId", "name slug description")
-    .populate("collectionIds", "name slug collectionType");
-};
-
-export const findAllProducts = async (): Promise<ProductDoc[]> => {
-  return await Product.find().sort({ createdAt: -1 });
-};
-
-export const findAllProductsWithDetails = async (): Promise<ProductDoc[]> => {
-  return await Product.find()
-    .populate("categoryId", "name slug description")
-    .populate("collectionIds", "name slug collectionType")
-    .sort({ createdAt: -1 });
-};
-
-export const findProductsByCategory = async (
-  categoryId: string
-): Promise<ProductDoc[]> => {
-  return await Product.find({ categoryId });
-};
-
-export const findProductsByCategoryPath = async (
-  categorySlug: string
-): Promise<ProductDoc[]> => {
-  return await Product.find({
-    $or: [
-      { categoryPath: categorySlug },
-      { categoryPath: new RegExp(`^${categorySlug}#`) },
-    ],
-    isActive: true,
-  }).sort({ createdAt: -1 });
-};
-
-export const findProductsByCollection = async (
-  collectionId: string
-): Promise<ProductDoc[]> => {
-  return await Product.find({ collectionIds: collectionId });
-};
-
-export const findActiveProducts = async (): Promise<ProductDoc[]> => {
-  return await Product.find({ isActive: true }).sort({ createdAt: -1 });
-};
-
-export const findActiveProductsWithDetails = async (): Promise<
-  ProductDoc[]
-> => {
-  return await Product.find({ isActive: true })
-    .populate("categoryId", "name slug description")
-    .populate("collectionIds", "name slug collectionType")
-    .sort({ createdAt: -1 });
+  return await Product.findById(id).populate(
+    "categoryId",
+    "name slug description"
+  );
 };
 
 export const findProductBySku = async (
   sku: string
 ): Promise<ProductDoc | null> => {
   return await Product.findOne({ sku });
-};
-
-export const findProductByVariantSku = async (
-  variantSku: string
-): Promise<ProductDoc | null> => {
-  return await Product.findOne({ "variants.sku": variantSku });
 };

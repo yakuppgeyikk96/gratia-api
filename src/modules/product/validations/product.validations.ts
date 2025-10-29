@@ -44,7 +44,11 @@ export const createProductSchema = z.object({
 
   categoryId: z.string().min(1, "Category is required"),
 
-  collectionIds: z.array(z.string()).default([]),
+  collectionSlugs: z
+    .array(
+      z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid collection slug")
+    )
+    .default([]),
 
   basePrice: z.number().min(0, "Base price cannot be negative"),
 

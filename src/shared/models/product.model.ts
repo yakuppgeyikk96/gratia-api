@@ -1,6 +1,5 @@
 import mongoose, { ObjectId, Schema } from "mongoose";
 import { CategoryDoc } from "./category.model";
-import { CollectionDoc } from "./collection.model";
 
 export interface ProductVariantAttributes {
   color?: string;
@@ -27,7 +26,7 @@ export interface ProductDoc {
   sku: string;
   categoryId: ObjectId | Partial<CategoryDoc>;
   categoryPath?: string; // Example: "men#shoes#sneakers"
-  collectionIds: ObjectId[] | Partial<CollectionDoc>[];
+  collectionSlugs?: string[];
   basePrice: number;
   baseDiscountedPrice?: number;
   images: string[];
@@ -107,10 +106,15 @@ const ProductSchema: Schema = new Schema(
       type: String,
       trim: true,
     },
-    collectionIds: {
-      type: [Schema.Types.ObjectId],
-      ref: "Collection",
+    collectionSlugs: {
+      type: [String],
       default: [],
+      validate: {
+        validator: (slugs: string[]) => {
+          return slugs.every((slug) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug));
+        },
+        message: "Invalid collection slug format",
+      },
     },
     basePrice: {
       type: Number,
@@ -153,7 +157,7 @@ ProductSchema.index({ slug: 1 });
 ProductSchema.index({ sku: 1 });
 ProductSchema.index({ categoryId: 1 });
 ProductSchema.index({ categoryPath: 1 });
-ProductSchema.index({ collectionIds: 1 });
+ProductSchema.index({ collectionSlugs: 1 });
 ProductSchema.index({ isActive: 1 });
 ProductSchema.index({ basePrice: 1 });
 ProductSchema.index({ "variants.attributes.color": 1 });

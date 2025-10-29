@@ -6,15 +6,11 @@ import { returnSuccess } from "../../../shared/utils/response.utils";
 import { PRODUCT_MESSAGES } from "../constants/product.constants";
 import {
   createProductService,
-  getActiveProductsService,
-  getAllProductsService,
   getProductByIdService,
-  getProductBySlugService,
-  getProductsByCategoryPathService,
-  getProductsByCategoryService,
-  getProductsByCollectionService,
+  getProductsService,
 } from "../services/product.services";
 import CreateProductDto from "../types/CreateProductDto";
+import { SortOptions } from "../types/ProductQueryOptionsDto";
 
 export const createProductController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -31,33 +27,81 @@ export const createProductController = asyncHandler(
   }
 );
 
-export const getAllProductsController = asyncHandler(
+export const getProductsController = asyncHandler(
   async (req: Request, res: Response) => {
+    const { categorySlug, collectionSlug, sort, page, limit } = req.query;
     const withDetails = req.query.details === "true";
 
-    const result = await getAllProductsService(withDetails);
+    console.log(req.query);
 
-    returnSuccess(
-      res,
-      result,
-      PRODUCT_MESSAGES.PRODUCTS_FOUND,
-      StatusCode.SUCCESS
+    const filters: any = {};
+
+    /**
+     * If the color filter is present, add it to the filters object
+     */
+    if (req.query["filters[color]"]) {
+      filters.colors = Array.isArray(req.query["filters[color]"])
+        ? req.query["filters[color]"]
+        : [req.query["filters[color]"]];
+    }
+
+    /**
+     * If the size filter is present, add it to the filters object
+     */
+    if (req.query["filters[size]"]) {
+      filters.sizes = Array.isArray(req.query["filters[size]"])
+        ? req.query["filters[size]"]
+        : [req.query["filters[size]"]];
+    }
+
+    /**
+     * If the brand filter is present, add it to the filters object
+     */
+    if (req.query["filters[brand]"]) {
+      filters.brands = Array.isArray(req.query["filters[brand]"])
+        ? req.query["filters[brand]"]
+        : [req.query["filters[brand]"]];
+    }
+
+    /**
+     * If the min price filter is present, add it to the filters object
+     */
+    if (req.query["filters[minPrice]"]) {
+      filters.minPrice = Number(req.query["filters[minPrice]"]);
+    }
+
+    /**
+     * If the max price filter is present, add it to the filters object
+     */
+    if (req.query["filters[maxPrice]"]) {
+      filters.maxPrice = Number(req.query["filters[maxPrice]"]);
+    }
+
+    /**
+     * If the material filter is present, add it to the filters object
+     */
+    if (req.query["filters[material]"]) {
+      filters.materials = Array.isArray(req.query["filters[material]"])
+        ? req.query["filters[material]"]
+        : [req.query["filters[material]"]];
+    }
+
+    /**
+     * Get the products
+     */
+    const result = await getProductsService(
+      {
+        categorySlug: categorySlug as string,
+        collectionSlug: collectionSlug as string,
+        filters: Object.keys(filters).length > 0 ? filters : undefined,
+        sort: (sort as unknown as SortOptions) || "newest",
+        page: Number(page) || 1,
+        limit: Number(limit) || 20,
+      },
+      withDetails
     );
-  }
-);
 
-export const getActiveProductsController = asyncHandler(
-  async (req: Request, res: Response) => {
-    const withDetails = req.query.details === "true";
-
-    const result = await getActiveProductsService(withDetails);
-
-    returnSuccess(
-      res,
-      result,
-      PRODUCT_MESSAGES.PRODUCTS_FOUND,
-      StatusCode.SUCCESS
-    );
+    returnSuccess(res, result, PRODUCT_MESSAGES.PRODUCTS_FOUND);
   }
 );
 
@@ -79,95 +123,6 @@ export const getProductByIdController = asyncHandler(
       res,
       result,
       PRODUCT_MESSAGES.PRODUCT_FOUND,
-      StatusCode.SUCCESS
-    );
-  }
-);
-
-export const getProductBySlugController = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { slug } = req.params;
-    const withDetails = req.query.details === "true";
-
-    if (!slug) {
-      throw new AppError(
-        PRODUCT_MESSAGES.PRODUCT_SLUG_REQUIRED,
-        ErrorCode.BAD_REQUEST
-      );
-    }
-
-    const result = await getProductBySlugService(slug, withDetails);
-
-    returnSuccess(
-      res,
-      result,
-      PRODUCT_MESSAGES.PRODUCT_FOUND,
-      StatusCode.SUCCESS
-    );
-  }
-);
-
-export const getProductsByCategoryController = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { categoryId } = req.params;
-
-    if (!categoryId) {
-      throw new AppError(
-        PRODUCT_MESSAGES.CATEGORY_ID_REQUIRED,
-        ErrorCode.BAD_REQUEST
-      );
-    }
-
-    const result = await getProductsByCategoryService(categoryId);
-
-    returnSuccess(
-      res,
-      result,
-      PRODUCT_MESSAGES.PRODUCTS_FOUND,
-      StatusCode.SUCCESS
-    );
-  }
-);
-
-export const getProductsByCollectionController = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { collectionId } = req.params;
-
-    if (!collectionId) {
-      throw new AppError(
-        PRODUCT_MESSAGES.COLLECTION_ID_REQUIRED,
-        ErrorCode.BAD_REQUEST
-      );
-    }
-
-    const result = await getProductsByCollectionService(collectionId);
-
-    returnSuccess(
-      res,
-      result,
-      PRODUCT_MESSAGES.PRODUCTS_FOUND,
-      StatusCode.SUCCESS
-    );
-  }
-);
-
-export const getProductsByCategoryPathController = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { categorySlug } = req.params;
-
-    if (!categorySlug) {
-      throw new AppError(
-        PRODUCT_MESSAGES.CATEGORY_SLUG_REQUIRED,
-        ErrorCode.BAD_REQUEST
-      );
-    }
-
-    const result = await getProductsByCategoryPathService(categorySlug);
-
-    returnSuccess(
-      res,
-      result,
-      PRODUCT_MESSAGES.PRODUCTS_FOUND,
       StatusCode.SUCCESS
     );
   }

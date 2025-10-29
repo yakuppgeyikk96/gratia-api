@@ -6,7 +6,7 @@ interface CreateProductDto {
   description: string;
   sku: string;
   categoryId: string;
-  collectionIds?: string[];
+  collectionSlugs?: string[];
   basePrice: number;
   baseDiscountedPrice?: number;
   images?: string[];

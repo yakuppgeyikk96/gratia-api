@@ -15,4 +15,5 @@ export const PRODUCT_MESSAGES = {
   CATEGORY_ID_REQUIRED: "Category ID is required",
   COLLECTION_ID_REQUIRED: "Collection ID is required",
   CATEGORY_SLUG_REQUIRED: "Category slug is required",
+  CATEGORY_OR_COLLECTION_REQUIRED: "Category or collection is required",
 } as const;
