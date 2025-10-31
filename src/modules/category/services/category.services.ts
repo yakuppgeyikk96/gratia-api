@@ -5,6 +5,7 @@ import { findCategoryBySlug } from "../repositories";
 import {
   createCategory,
   findActiveCategories,
+  findActiveRootCategories,
   findAllCategories,
   findCategoriesByParentId,
   findCategoryById,
@@ -52,6 +53,12 @@ export const getAllCategoriesService = async (): Promise<CategoryDoc[]> => {
 
 export const getActiveCategoriesService = async (): Promise<CategoryDoc[]> => {
   return await findActiveCategories();
+};
+
+export const getActiveRootCategoriesService = async (): Promise<
+  CategoryDoc[]
+> => {
+  return await findActiveRootCategories();
 };
 
 export const getCategoryByIdService = async (

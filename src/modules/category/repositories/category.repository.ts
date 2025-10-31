@@ -36,3 +36,10 @@ export const findActiveCategories = async (): Promise<CategoryDoc[]> => {
     name: 1,
   });
 };
+
+export const findActiveRootCategories = async (): Promise<CategoryDoc[]> => {
+  return await Category.find({ isActive: true, level: 0 }).sort({
+    sortOrder: 1,
+    name: 1,
+  });
+};

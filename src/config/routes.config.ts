@@ -2,6 +2,7 @@ import { Express, Router } from "express";
 import authRoutes from "../modules/auth/routes/auth.routes";
 import categoryRoutes from "../modules/category/routes/category.routes";
 import collectionRoutes from "../modules/collection/routes/collection.routes";
+import navigationRoutes from "../modules/navigation/routes/navigation.routes";
 import productRoutes from "../modules/product/routes/product.routes";
 import seedRoutes from "../modules/seed/routes/seed.routes";
 
@@ -15,6 +16,7 @@ export const routesConfig = (app: Express) => {
   router.use("/collections", collectionRoutes);
   router.use("/products", productRoutes);
   router.use("/seed", seedRoutes);
+  router.use("/navigation", navigationRoutes);
 
   app.use(`${basePath}`, router);
 };
