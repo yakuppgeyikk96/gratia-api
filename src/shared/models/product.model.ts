@@ -16,6 +16,7 @@ export interface ProductVariant {
   stock: number;
   price?: number;
   discountedPrice?: number;
+  images?: string[];
 }
 
 export interface ProductDoc {
@@ -29,6 +30,8 @@ export interface ProductDoc {
   collectionSlugs?: string[];
   basePrice: number;
   baseDiscountedPrice?: number;
+  baseStock: number;
+  baseAttributes: ProductVariantAttributes;
   images: string[];
   variants: ProductVariant[];
   metaTitle?: string;
@@ -65,6 +68,10 @@ const VariantSchema: Schema = new Schema(
     discountedPrice: {
       type: Number,
       min: [0, "Discounted price cannot be negative"],
+    },
+    images: {
+      type: [String],
+      default: [],
     },
   },
   { _id: false }
@@ -124,6 +131,19 @@ const ProductSchema: Schema = new Schema(
     baseDiscountedPrice: {
       type: Number,
       min: [0, "Discounted price cannot be negative"],
+    },
+    baseStock: {
+      type: Number,
+      required: [true, "Base stock is required"],
+      min: [0, "Stock cannot be negative"],
+    },
+    baseAttributes: {
+      color: { type: String, trim: true },
+      size: { type: String, trim: true },
+      material: { type: String, trim: true },
+      brand: { type: String, trim: true },
+      style: { type: String, trim: true },
+      pattern: { type: String, trim: true },
     },
     images: {
       type: [String],

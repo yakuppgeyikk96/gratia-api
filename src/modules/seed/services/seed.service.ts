@@ -209,9 +209,14 @@ export const seedDatabaseService = async (): Promise<SeedResult> => {
                 stock: Math.floor(Math.random() * 20) + 5,
                 price: basePrice,
                 discountedPrice: discountedPrice,
+                images: [],
               });
             }
           }
+
+          // Base attributes from first variant
+          const baseColor = variantColors[0] || "Black";
+          const baseSize = variantSizes[0] || "M";
 
           products.push({
             name: productName,
@@ -223,10 +228,12 @@ export const seedDatabaseService = async (): Promise<SeedResult> => {
             collectionSlugs: getRandomCollections(),
             basePrice,
             baseDiscountedPrice: discountedPrice,
-            images: [
-              `https://example.com/images/${productSlug}-1.jpg`,
-              `https://example.com/images/${productSlug}-2.jpg`,
-            ],
+            baseStock: Math.floor(Math.random() * 50) + 20,
+            baseAttributes: {
+              color: baseColor,
+              size: baseSize,
+            },
+            images: [],
             variants,
             isActive: true,
           });

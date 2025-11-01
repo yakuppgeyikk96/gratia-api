@@ -32,8 +32,6 @@ export const getProductsController = asyncHandler(
     const { categorySlug, collectionSlug, sort, page, limit } = req.query;
     const withDetails = req.query.details === "true";
 
-    console.log(req.query);
-
     const filters: any = {};
 
     /**
