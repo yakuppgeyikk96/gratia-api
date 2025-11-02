@@ -27,14 +27,14 @@ router.post("/", validateBody(addToCartSchema), addToCartController);
 // PUT /api/cart - Update cart item quantity
 router.put("/", validateBody(updateCartItemSchema), updateCartItemController);
 
+// DELETE /api/cart - Clear cart
+router.delete("/", clearCartController);
+
 // DELETE /api/cart/:sku - Remove item from cart
 router.delete(
   "/:sku",
   validateParams(removeFromCartParamsSchema),
   removeFromCartController
 );
-
-// DELETE /api/cart - Clear cart
-router.delete("/", clearCartController);
 
 export default router;

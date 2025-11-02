@@ -93,9 +93,9 @@ export const getProductDetails = (
   }
 
   const variantDiscounted =
-    variant.discountedPrice || product.baseDiscountedPrice;
+    variant.discountedPrice ?? product.baseDiscountedPrice;
   return {
-    price: variant.price || product.basePrice,
+    price: variant.price ?? product.basePrice,
     ...(variantDiscounted !== undefined && {
       discountedPrice: variantDiscounted,
     }),
