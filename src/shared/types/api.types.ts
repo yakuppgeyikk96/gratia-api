@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export interface IApiResponse<T = any> {
   success: boolean;
   message: string;
@@ -30,4 +32,13 @@ export enum StatusCode {
   FORBIDDEN = 403,
   NOT_FOUND = 404,
   INTERNAL_SERVER_ERROR = 500,
+}
+
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
 }
