@@ -1,3 +1,4 @@
+export * from "./cart.model";
 export * from "./category.model";
 export * from "./collection.model";
 export * from "./email-verification.model";
