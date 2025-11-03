@@ -11,10 +11,12 @@ import {
   findProductBySku,
   findProductBySlug,
   findProducts,
+  findProductsByGroupId,
 } from "../repositories";
 import CreateProductDto from "../types/CreateProductDto";
 import ProductQueryOptionsDto from "../types/ProductQueryOptionsDto";
 import ProductsResponseDto from "../types/ProductsResponseDto";
+import ProductWithVariantsDto from "../types/ProductWithVariantsDto";
 
 export const createProductService = async (
   data: CreateProductDto
@@ -138,4 +140,46 @@ export const getProductByIdService = async (
   }
 
   return product;
+};
+
+export const getProductWithVariantsService = async (
+  slug: string
+): Promise<ProductWithVariantsDto> => {
+  /**
+   * Find the product by slug
+   */
+  const product = await findProductBySlug(slug);
+  if (!product) {
+    throw new AppError(PRODUCT_MESSAGES.PRODUCT_NOT_FOUND, ErrorCode.NOT_FOUND);
+  }
+
+  /**
+   * Find all variants in the same product group
+   */
+  const variants = await findProductsByGroupId(product.productGroupId);
+
+  /**
+   * Extract available options from variants
+   */
+  const colors = new Set<string>();
+  const sizes = new Set<string>();
+  const materials = new Set<string>();
+
+  variants.forEach((v) => {
+    if (v.attributes.color) colors.add(v.attributes.color);
+    if (v.attributes.size) sizes.add(v.attributes.size);
+    if (v.attributes.material) materials.add(v.attributes.material);
+  });
+
+  const availableOptions = {
+    colors: Array.from(colors).sort(),
+    sizes: Array.from(sizes).sort(),
+    materials: Array.from(materials).sort(),
+  };
+
+  return {
+    product,
+    variants,
+    availableOptions,
+  };
 };

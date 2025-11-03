@@ -1,11 +1,7 @@
 import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import { CartDoc } from "../../../shared/models/cart.model";
 import { CART_LIMITS, CART_MESSAGES } from "../constants/cart.constants";
-import {
-  buildCartItem,
-  getProductDetails,
-  validateProductAndStock,
-} from "../helpers";
+import { buildCartItem, validateProductAndStock } from "../helpers";
 import {
   addItemToCart,
   clearCart,
@@ -24,7 +20,7 @@ export const addToCartService = async (
   userId: string,
   data: AddToCartDto
 ): Promise<CartDoc> => {
-  const { productId, sku, quantity, attributes } = data;
+  const { productId, sku, quantity } = data;
 
   // 1. Get or create cart
   const cart = await findOrCreateCart(userId);
@@ -51,13 +47,15 @@ export const addToCartService = async (
   }
 
   // 4. Validate product and stock
-  const product = await validateProductAndStock(productId, sku, quantity);
+  const product = await validateProductAndStock(productId, quantity);
 
-  // 5. Get product details (price, images, attributes)
-  const details = getProductDetails(product, sku, attributes);
+  // 5. Verify SKU matches
+  if (product.sku !== sku) {
+    throw new AppError(CART_MESSAGES.INVALID_SKU, ErrorCode.BAD_REQUEST);
+  }
 
   // 6. Build cart item
-  const cartItem = buildCartItem(product, sku, quantity, details);
+  const cartItem = buildCartItem(product, quantity);
 
   // 7. Add to cart
   const updatedCart = await addItemToCart(userId, cartItem);
@@ -84,11 +82,7 @@ export const updateCartItemService = async (
   }
 
   // 2. Validate product and stock availability
-  await validateProductAndStock(
-    existingItem.productId.toString(),
-    sku,
-    quantity
-  );
+  await validateProductAndStock(existingItem.productId.toString(), quantity);
 
   // 3. Update cart item
   const updatedCart = await updateCartItem(userId, sku, quantity);

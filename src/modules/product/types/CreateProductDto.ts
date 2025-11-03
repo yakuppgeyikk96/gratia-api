@@ -1,16 +1,18 @@
-import { ProductVariant } from "../../../shared/models/product.model";
+import { ProductAttributes } from "../../../shared/models/product.model";
 
 interface CreateProductDto {
   name: string;
   slug: string;
-  description: string;
+  description?: string;
   sku: string;
   categoryId: string;
   collectionSlugs?: string[];
-  basePrice: number;
-  baseDiscountedPrice?: number;
+  price: number;
+  discountedPrice?: number;
+  stock: number;
+  attributes?: ProductAttributes;
   images?: string[];
-  variants?: ProductVariant[];
+  productGroupId?: string;
   metaTitle?: string;
   metaDescription?: string;
   isActive?: boolean;

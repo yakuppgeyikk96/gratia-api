@@ -1,5 +1,3 @@
-// src/modules/seed/services/seed.service.ts
-
 import Category, { CategoryDoc } from "../../../shared/models/category.model";
 import Collection from "../../../shared/models/collection.model";
 import Product from "../../../shared/models/product.model";
@@ -165,11 +163,11 @@ export const seedDatabaseService = async (): Promise<SeedResult> => {
   }
 
   /**
-   * Create products
+   * Create products (each variant is now a separate product)
    */
   const products: any[] = [];
-  const colors = ["Black", "White", "Red", "Blue", "Brown"];
-  const sizes = ["S", "M", "L", "XL"];
+  const colors = ["black", "white", "red", "blue"]; // Lowercase for standardization
+  const sizes = ["S", "M", "L", "XL"]; // Uppercase for standardization
 
   for (const [mainCat, level1Cats] of Object.entries(level2Map)) {
     for (const [level1Cat, level2Cats] of Object.entries(
@@ -183,60 +181,50 @@ export const seedDatabaseService = async (): Promise<SeedResult> => {
         );
 
         /**
-         * Create products
+         * Create product groups (each with multiple variants)
          */
         for (let i = 1; i <= 2; i++) {
-          const productSlug = `${(level2Doc as any).slug}-product-${i}`;
-          const productName = `${level2Cat} Product ${i}`;
+          const baseProductSlug = `${(level2Doc as any).slug}-product-${i}`;
+          const baseProductName = `${level2Cat} Product ${i}`;
           const basePrice = Math.floor(Math.random() * 300) + 50;
-          const discountedPrice = basePrice * 0.8;
+          const discountedPrice = Math.round(basePrice * 0.8);
 
-          /**
-           * Create variants
-           */
-          const variants = [];
+          // Generate a unique product group ID
+          const productGroupId = `pg_${baseProductSlug}`;
+
+          // Select colors and sizes for this product group
           const variantColors = colors.slice(0, 2);
           const variantSizes = sizes.slice(0, 2);
 
+          /**
+           * Create individual products for each color+size combination
+           */
           for (const color of variantColors) {
             for (const size of variantSizes) {
-              variants.push({
+              const variantSlug = `${baseProductSlug}-${color}-${size.toLowerCase()}`;
+              const variantSku = `SKU-${variantSlug.toUpperCase()}`;
+
+              products.push({
+                name: baseProductName,
+                slug: variantSlug,
+                description: `Premium quality ${baseProductName.toLowerCase()} with modern design. Available in ${color} color and ${size} size.`,
+                sku: variantSku,
+                categoryId: (level2Doc as any)._id,
+                categoryPath,
+                collectionSlugs: getRandomCollections(),
+                price: basePrice,
+                discountedPrice: discountedPrice,
+                stock: Math.floor(Math.random() * 50) + 10,
                 attributes: {
                   color,
                   size,
                 },
-                sku: `${productSlug}-${color.toLowerCase()}-${size}`,
-                stock: Math.floor(Math.random() * 20) + 5,
-                price: basePrice,
-                discountedPrice: discountedPrice,
                 images: [],
+                productGroupId,
+                isActive: true,
               });
             }
           }
-
-          // Base attributes from first variant
-          const baseColor = variantColors[0] || "Black";
-          const baseSize = variantSizes[0] || "M";
-
-          products.push({
-            name: productName,
-            slug: productSlug,
-            description: `Premium quality ${productName.toLowerCase()} with modern design.`,
-            sku: `SKU-${productSlug.toUpperCase()}`,
-            categoryId: (level2Doc as any)._id,
-            categoryPath,
-            collectionSlugs: getRandomCollections(),
-            basePrice,
-            baseDiscountedPrice: discountedPrice,
-            baseStock: Math.floor(Math.random() * 50) + 20,
-            baseAttributes: {
-              color: baseColor,
-              size: baseSize,
-            },
-            images: [],
-            variants,
-            isActive: true,
-          });
         }
       }
     }

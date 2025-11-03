@@ -6,4 +6,5 @@ export {
   findProductBySku,
   findProductBySlug,
   findProducts,
+  findProductsByGroupId,
 } from "./product.repository";

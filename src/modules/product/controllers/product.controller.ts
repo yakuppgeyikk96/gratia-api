@@ -8,6 +8,7 @@ import {
   createProductService,
   getProductByIdService,
   getProductsService,
+  getProductWithVariantsService,
 } from "../services/product.services";
 import CreateProductDto from "../types/CreateProductDto";
 import { SortOptions } from "../types/ProductQueryOptionsDto";
@@ -53,12 +54,12 @@ export const getProductsController = asyncHandler(
     }
 
     /**
-     * If the brand filter is present, add it to the filters object
+     * If the material filter is present, add it to the filters object
      */
-    if (req.query["filters[brand]"]) {
-      filters.brands = Array.isArray(req.query["filters[brand]"])
-        ? req.query["filters[brand]"]
-        : [req.query["filters[brand]"]];
+    if (req.query["filters[material]"]) {
+      filters.materials = Array.isArray(req.query["filters[material]"])
+        ? req.query["filters[material]"]
+        : [req.query["filters[material]"]];
     }
 
     /**
@@ -73,15 +74,6 @@ export const getProductsController = asyncHandler(
      */
     if (req.query["filters[maxPrice]"]) {
       filters.maxPrice = Number(req.query["filters[maxPrice]"]);
-    }
-
-    /**
-     * If the material filter is present, add it to the filters object
-     */
-    if (req.query["filters[material]"]) {
-      filters.materials = Array.isArray(req.query["filters[material]"])
-        ? req.query["filters[material]"]
-        : [req.query["filters[material]"]];
     }
 
     /**
@@ -116,6 +108,28 @@ export const getProductByIdController = asyncHandler(
     }
 
     const result = await getProductByIdService(id, withDetails);
+
+    returnSuccess(
+      res,
+      result,
+      PRODUCT_MESSAGES.PRODUCT_FOUND,
+      StatusCode.SUCCESS
+    );
+  }
+);
+
+export const getProductWithVariantsController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { slug } = req.params;
+
+    if (!slug) {
+      throw new AppError(
+        PRODUCT_MESSAGES.PRODUCT_SLUG_REQUIRED,
+        ErrorCode.BAD_REQUEST
+      );
+    }
+
+    const result = await getProductWithVariantsService(slug);
 
     returnSuccess(
       res,

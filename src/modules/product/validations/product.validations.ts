@@ -1,26 +1,70 @@
 import { z } from "zod";
 
-const variantAttributesSchema = z.object({
-  color: z.string().trim().optional(),
-  size: z.string().trim().optional(),
-  material: z.string().trim().optional(),
-  brand: z.string().trim().optional(),
-  style: z.string().trim().optional(),
-  pattern: z.string().trim().optional(),
-});
+// Standardized attribute enums
+const productColorEnum = z.enum([
+  "black",
+  "white",
+  "gray",
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "orange",
+  "purple",
+  "pink",
+  "brown",
+  "beige",
+  "navy",
+  "teal",
+  "burgundy",
+  "olive",
+  "cream",
+  "tan",
+  "maroon",
+  "coral",
+  "silver",
+  "gold",
+  "khaki",
+  "mint",
+  "lavender",
+]);
 
-const productVariantSchema = z.object({
-  attributes: variantAttributesSchema,
-  sku: z.string().min(1, "SKU is required").trim(),
-  stock: z
-    .number()
-    .int("Stock must be an integer")
-    .min(0, "Stock cannot be negative"),
-  price: z.number().min(0, "Price cannot be negative").optional(),
-  discountedPrice: z
-    .number()
-    .min(0, "Discounted price cannot be negative")
-    .optional(),
+const productSizeEnum = z.enum([
+  "XXS",
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "XXXL",
+  "one-size",
+]);
+
+const productMaterialEnum = z.enum([
+  "cotton",
+  "polyester",
+  "wool",
+  "silk",
+  "linen",
+  "denim",
+  "leather",
+  "suede",
+  "cashmere",
+  "nylon",
+  "spandex",
+  "rayon",
+  "velvet",
+  "satin",
+  "acrylic",
+  "modal",
+  "viscose",
+]);
+
+const productAttributesSchema = z.object({
+  color: productColorEnum.optional(),
+  size: productSizeEnum.optional(),
+  material: productMaterialEnum.optional(),
 });
 
 export const createProductSchema = z.object({
@@ -38,7 +82,7 @@ export const createProductSchema = z.object({
     .trim()
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Please enter a valid slug"),
 
-  description: z.string().min(1, "Product description is required").trim(),
+  description: z.string().trim().optional(),
 
   sku: z.string().min(1, "Product SKU is required").trim(),
 
@@ -50,16 +94,23 @@ export const createProductSchema = z.object({
     )
     .default([]),
 
-  basePrice: z.number().min(0, "Base price cannot be negative"),
+  price: z.number().min(0, "Price cannot be negative"),
 
-  baseDiscountedPrice: z
+  discountedPrice: z
     .number()
     .min(0, "Discounted price cannot be negative")
     .optional(),
 
+  stock: z
+    .number()
+    .int("Stock must be an integer")
+    .min(0, "Stock cannot be negative"),
+
+  attributes: productAttributesSchema.optional(),
+
   images: z.array(z.string().url("Please enter a valid URL")).default([]),
 
-  variants: z.array(productVariantSchema).default([]),
+  productGroupId: z.string().trim().optional(),
 
   metaTitle: z
     .string()

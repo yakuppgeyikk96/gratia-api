@@ -67,34 +67,17 @@ export const findProducts = async (
   }
 
   /**
-   * Variant Filters
+   * Attribute Filters
    */
-  if (
-    filters &&
-    (filters.colors || filters.sizes || filters.brands || filters.materials)
-  ) {
-    query.$or = [];
-
-    if (
-      filters.colors ||
-      filters.sizes ||
-      filters.brands ||
-      filters.materials
-    ) {
-      query["variants"] = {
-        $elemMatch: {
-          ...(filters.colors && {
-            "attributes.color": { $in: filters.colors },
-          }),
-          ...(filters.sizes && { "attributes.size": { $in: filters.sizes } }),
-          ...(filters.brands && {
-            "attributes.brand": { $in: filters.brands },
-          }),
-          ...(filters.materials && {
-            "attributes.material": { $in: filters.materials },
-          }),
-        },
-      };
+  if (filters) {
+    if (filters.colors && filters.colors.length > 0) {
+      query["attributes.color"] = { $in: filters.colors };
+    }
+    if (filters.sizes && filters.sizes.length > 0) {
+      query["attributes.size"] = { $in: filters.sizes };
+    }
+    if (filters.materials && filters.materials.length > 0) {
+      query["attributes.material"] = { $in: filters.materials };
     }
   }
 
@@ -102,9 +85,9 @@ export const findProducts = async (
    * Price Filters
    */
   if (filters && (filters.minPrice || filters.maxPrice)) {
-    query.basePrice = {};
-    if (filters.minPrice) query.basePrice.$gte = filters.minPrice;
-    if (filters.maxPrice) query.basePrice.$lte = filters.maxPrice;
+    query.price = {};
+    if (filters.minPrice) query.price.$gte = filters.minPrice;
+    if (filters.maxPrice) query.price.$lte = filters.maxPrice;
   }
 
   // Sorting
@@ -114,10 +97,10 @@ export const findProducts = async (
       sortQuery = { createdAt: -1 };
       break;
     case "price-low":
-      sortQuery = { basePrice: 1 };
+      sortQuery = { price: 1 };
       break;
     case "price-high":
-      sortQuery = { basePrice: -1 };
+      sortQuery = { price: -1 };
       break;
     case "name":
       sortQuery = { name: 1 };
@@ -163,29 +146,25 @@ export const extractFilterOptions = async (
 
   const colors = new Set<string>();
   const sizes = new Set<string>();
-  const brands = new Set<string>();
   const materials = new Set<string>();
   const prices: number[] = [];
 
   products.forEach((product) => {
-    prices.push(product.basePrice);
-    if (product.baseDiscountedPrice) {
-      prices.push(product.baseDiscountedPrice);
+    // Add price
+    prices.push(product.price);
+    if (product.discountedPrice) {
+      prices.push(product.discountedPrice);
     }
 
-    product.variants.forEach((variant) => {
-      if (variant.attributes.color) colors.add(variant.attributes.color);
-      if (variant.attributes.size) sizes.add(variant.attributes.size);
-      if (variant.attributes.brand) brands.add(variant.attributes.brand);
-      if (variant.attributes.material)
-        materials.add(variant.attributes.material);
-    });
+    // Add attributes
+    if (product.attributes.color) colors.add(product.attributes.color);
+    if (product.attributes.size) sizes.add(product.attributes.size);
+    if (product.attributes.material) materials.add(product.attributes.material);
   });
 
   return {
     colors: Array.from(colors).sort(),
     sizes: Array.from(sizes).sort(),
-    brands: Array.from(brands).sort(),
     materials: Array.from(materials).sort(),
     priceRange: {
       min: prices.length > 0 ? Math.min(...prices) : 0,
@@ -219,4 +198,13 @@ export const findProductBySku = async (
   sku: string
 ): Promise<ProductDoc | null> => {
   return await Product.findOne({ sku });
+};
+
+export const findProductsByGroupId = async (
+  productGroupId: string
+): Promise<ProductDoc[]> => {
+  return await Product.find({
+    productGroupId,
+    isActive: true,
+  }).sort({ "attributes.color": 1, "attributes.size": 1 });
 };

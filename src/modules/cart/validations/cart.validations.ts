@@ -1,14 +1,5 @@
 import { z } from "zod";
 
-const variantAttributesSchema = z.object({
-  color: z.string().trim().optional(),
-  size: z.string().trim().optional(),
-  material: z.string().trim().optional(),
-  brand: z.string().trim().optional(),
-  style: z.string().trim().optional(),
-  pattern: z.string().trim().optional(),
-});
-
 export const addToCartSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
   sku: z.string().min(1, "SKU is required").trim(),
@@ -17,7 +8,6 @@ export const addToCartSchema = z.object({
     .int("Quantity must be an integer")
     .min(1, "Quantity must be at least 1")
     .max(100, "Quantity cannot exceed 100"),
-  attributes: variantAttributesSchema.optional(),
 });
 
 export const updateCartItemSchema = z.object({

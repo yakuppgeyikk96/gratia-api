@@ -1,22 +1,68 @@
 import mongoose, { ObjectId, Schema } from "mongoose";
 import { CategoryDoc } from "./category.model";
 
-export interface ProductVariantAttributes {
-  color?: string;
-  size?: string;
-  material?: string;
-  brand?: string;
-  style?: string;
-  pattern?: string;
-}
+// Standardized product attribute types
+export type ProductColor =
+  | "black"
+  | "white"
+  | "gray"
+  | "red"
+  | "blue"
+  | "green"
+  | "yellow"
+  | "orange"
+  | "purple"
+  | "pink"
+  | "brown"
+  | "beige"
+  | "navy"
+  | "teal"
+  | "burgundy"
+  | "olive"
+  | "cream"
+  | "tan"
+  | "maroon"
+  | "coral"
+  | "silver"
+  | "gold"
+  | "khaki"
+  | "mint"
+  | "lavender";
 
-export interface ProductVariant {
-  attributes: ProductVariantAttributes;
-  sku: string;
-  stock: number;
-  price?: number;
-  discountedPrice?: number;
-  images?: string[];
+export type ProductSize =
+  | "XXS"
+  | "XS"
+  | "S"
+  | "M"
+  | "L"
+  | "XL"
+  | "XXL"
+  | "XXXL"
+  | "one-size";
+
+export type ProductMaterial =
+  | "cotton"
+  | "polyester"
+  | "wool"
+  | "silk"
+  | "linen"
+  | "denim"
+  | "leather"
+  | "suede"
+  | "cashmere"
+  | "nylon"
+  | "spandex"
+  | "rayon"
+  | "velvet"
+  | "satin"
+  | "acrylic"
+  | "modal"
+  | "viscose";
+
+export interface ProductAttributes {
+  color?: ProductColor;
+  size?: ProductSize;
+  material?: ProductMaterial;
 }
 
 export interface ProductDoc {
@@ -26,56 +72,20 @@ export interface ProductDoc {
   description?: string;
   sku: string;
   categoryId: ObjectId | Partial<CategoryDoc>;
-  categoryPath?: string; // Example: "men#shoes#sneakers"
+  categoryPath?: string;
   collectionSlugs?: string[];
-  basePrice: number;
-  baseDiscountedPrice?: number;
-  baseStock: number;
-  baseAttributes: ProductVariantAttributes;
+  price: number;
+  discountedPrice?: number;
+  stock: number;
+  attributes: ProductAttributes;
   images: string[];
-  variants: ProductVariant[];
+  productGroupId: string;
   metaTitle?: string;
   metaDescription?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
-
-const VariantSchema: Schema = new Schema(
-  {
-    attributes: {
-      color: { type: String, trim: true },
-      size: { type: String, trim: true },
-      material: { type: String, trim: true },
-      brand: { type: String, trim: true },
-      style: { type: String, trim: true },
-      pattern: { type: String, trim: true },
-    },
-    sku: {
-      type: String,
-      required: [true, "SKU is required"],
-      trim: true,
-    },
-    stock: {
-      type: Number,
-      required: [true, "Stock is required"],
-      min: [0, "Stock cannot be negative"],
-    },
-    price: {
-      type: Number,
-      min: [0, "Price cannot be negative"],
-    },
-    discountedPrice: {
-      type: Number,
-      min: [0, "Discounted price cannot be negative"],
-    },
-    images: {
-      type: [String],
-      default: [],
-    },
-  },
-  { _id: false }
-);
 
 const ProductSchema: Schema = new Schema(
   {
@@ -95,7 +105,6 @@ const ProductSchema: Schema = new Schema(
     },
     description: {
       type: String,
-      required: [true, "Product description is required"],
       trim: true,
     },
     sku: {
@@ -123,35 +132,89 @@ const ProductSchema: Schema = new Schema(
         message: "Invalid collection slug format",
       },
     },
-    basePrice: {
+    price: {
       type: Number,
-      required: [true, "Base price is required"],
-      min: [0, "Base price cannot be negative"],
+      required: [true, "Price is required"],
+      min: [0, "Price cannot be negative"],
     },
-    baseDiscountedPrice: {
+    discountedPrice: {
       type: Number,
       min: [0, "Discounted price cannot be negative"],
     },
-    baseStock: {
+    stock: {
       type: Number,
-      required: [true, "Base stock is required"],
+      required: [true, "Stock is required"],
       min: [0, "Stock cannot be negative"],
     },
-    baseAttributes: {
-      color: { type: String, trim: true },
-      size: { type: String, trim: true },
-      material: { type: String, trim: true },
-      brand: { type: String, trim: true },
-      style: { type: String, trim: true },
-      pattern: { type: String, trim: true },
+    attributes: {
+      color: {
+        type: String,
+        enum: [
+          "black",
+          "white",
+          "gray",
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "orange",
+          "purple",
+          "pink",
+          "brown",
+          "beige",
+          "navy",
+          "teal",
+          "burgundy",
+          "olive",
+          "cream",
+          "tan",
+          "maroon",
+          "coral",
+          "silver",
+          "gold",
+          "khaki",
+          "mint",
+          "lavender",
+        ],
+        lowercase: true,
+      },
+      size: {
+        type: String,
+        enum: ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "one-size"],
+        uppercase: true,
+      },
+      material: {
+        type: String,
+        enum: [
+          "cotton",
+          "polyester",
+          "wool",
+          "silk",
+          "linen",
+          "denim",
+          "leather",
+          "suede",
+          "cashmere",
+          "nylon",
+          "spandex",
+          "rayon",
+          "velvet",
+          "satin",
+          "acrylic",
+          "modal",
+          "viscose",
+        ],
+        lowercase: true,
+      },
     },
     images: {
       type: [String],
       default: [],
     },
-    variants: {
-      type: [VariantSchema],
-      default: [],
+    productGroupId: {
+      type: String,
+      required: true,
+      index: true,
     },
     metaTitle: {
       type: String,
@@ -173,14 +236,29 @@ const ProductSchema: Schema = new Schema(
   }
 );
 
+// Pre-save hook: Auto-generate productGroupId if not provided
+ProductSchema.pre("save", function (next) {
+  const product = this as unknown as ProductDoc;
+  if (!product.productGroupId) {
+    product.productGroupId = `pg_${product._id.toString()}`;
+  }
+  next();
+});
+
+// Indexes
 ProductSchema.index({ slug: 1 });
 ProductSchema.index({ sku: 1 });
+ProductSchema.index({ productGroupId: 1 });
 ProductSchema.index({ categoryId: 1 });
 ProductSchema.index({ categoryPath: 1 });
 ProductSchema.index({ collectionSlugs: 1 });
 ProductSchema.index({ isActive: 1 });
-ProductSchema.index({ basePrice: 1 });
-ProductSchema.index({ "variants.attributes.color": 1 });
-ProductSchema.index({ "variants.attributes.size": 1 });
+ProductSchema.index({ price: 1 });
+ProductSchema.index({ "attributes.color": 1 });
+ProductSchema.index({ "attributes.size": 1 });
+ProductSchema.index({ "attributes.material": 1 });
+// Compound index for common filter combinations
+ProductSchema.index({ "attributes.color": 1, "attributes.size": 1, price: 1 });
+ProductSchema.index({ categoryId: 1, price: 1 });
 
 export default mongoose.model<ProductDoc>("Product", ProductSchema);

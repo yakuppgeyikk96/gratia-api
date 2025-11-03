@@ -55,28 +55,22 @@ interface CartItem {
   productName: string; // Product name (snapshot)
   productImages: string[]; // Product images (snapshot)
   attributes: {
-    // Product attributes
+    // Product attributes (standardized)
     color?: string;
     size?: string;
     material?: string;
-    brand?: string;
-    style?: string;
-    pattern?: string;
   };
   isVariant: boolean; // Is this a variant or base product
 }
 ```
 
-### Product Variant Attributes
+### Product Attributes
 
 ```typescript
-interface ProductVariantAttributes {
+interface ProductAttributes {
   color?: string;
   size?: string;
   material?: string;
-  brand?: string;
-  style?: string;
-  pattern?: string;
 }
 ```
 
@@ -150,11 +144,7 @@ Content-Type: application/json
 {
   "productId": "650prod123...",
   "sku": "PROD-001-RED-M",
-  "quantity": 2,
-  "attributes": {
-    "color": "Red",
-    "size": "M"
-  }
+  "quantity": 2
 }
 ```
 
@@ -163,7 +153,6 @@ Content-Type: application/json
 - `productId`: Required, non-empty string
 - `sku`: Required, non-empty string
 - `quantity`: Required, integer, min: 1, max: 100
-- `attributes`: Optional object
 
 **Response (200 OK):**
 
@@ -326,8 +315,7 @@ CART_LIMITS = {
 
 #### 2. Stock Validation
 
-- ✅ For base product: `product.baseStock >= quantity`
-- ✅ For variant: `variant.stock >= quantity`
+- ✅ Product stock check: `product.stock >= quantity`
 
 #### 3. Quantity Validation
 
@@ -371,16 +359,15 @@ The code uses nullish coalescing to properly handle `0` prices (e.g., free items
 
 ```typescript
 // ✅ CORRECT
-price = variant.price ?? product.basePrice;
-discountedPrice = variant.discountedPrice ?? product.baseDiscountedPrice;
+const itemPrice = item.discountedPrice ?? item.price;
 
 // ❌ WRONG
-price = variant.price || product.basePrice; // 0 price would fallback to base price!
+const itemPrice = item.discountedPrice || item.price; // 0 price would fallback to base price!
 ```
 
 **Why this matters:**
 
-- Using `||` treats `0` as falsy and incorrectly falls back to the base price
+- Using `||` treats `0` as falsy and incorrectly falls back to the regular price
 - Using `??` only falls back when the value is `null` or `undefined`
 - This ensures free items (price: 0) are handled correctly
 

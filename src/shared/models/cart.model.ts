@@ -1,5 +1,5 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
-import { ProductVariantAttributes } from "./product.model";
+import { ProductAttributes } from "./product.model";
 
 export interface CartItem {
   productId: ObjectId;
@@ -9,7 +9,7 @@ export interface CartItem {
   discountedPrice?: number;
   productName: string;
   productImages: string[];
-  attributes: ProductVariantAttributes;
+  attributes: ProductAttributes;
   isVariant: boolean;
 }
 
@@ -66,9 +66,6 @@ const CartItemSchema: Schema = new Schema(
       color: { type: String, trim: true },
       size: { type: String, trim: true },
       material: { type: String, trim: true },
-      brand: { type: String, trim: true },
-      style: { type: String, trim: true },
-      pattern: { type: String, trim: true },
     },
     isVariant: {
       type: Boolean,
@@ -118,7 +115,7 @@ CartSchema.pre("save", function (next) {
 
   cart.totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
   cart.totalPrice = cart.items.reduce((sum, item) => {
-    const itemPrice = item.discountedPrice || item.price;
+    const itemPrice = item.discountedPrice ?? item.price;
     return sum + itemPrice * item.quantity;
   }, 0);
 

@@ -4,7 +4,6 @@ export interface FilterOptions {
   colors: string[];
   sizes: string[];
   materials: string[];
-  brands: string[];
   priceRange: {
     min: number;
     max: number;
