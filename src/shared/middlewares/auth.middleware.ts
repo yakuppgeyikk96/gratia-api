@@ -1,21 +1,25 @@
 import { NextFunction, Response } from "express";
-import { AppError, ErrorCode } from "../errors/base.errors";
-import { AuthRequest } from "../types";
+import { ErrorCode } from "../errors/base.errors";
+import { AuthRequest, IApiErrorResponse } from "../types";
 import { verifyJwtToken } from "../utils/jwt.utils";
 
 export const authMiddleware = async (
   req: AuthRequest,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
-      throw new AppError(
-        "Authentication token is required",
-        ErrorCode.UNAUTHORIZED
-      );
+      const noAuthResponse: IApiErrorResponse = {
+        success: false,
+        message: "Authentication token is required",
+        errors: [],
+        errorCode: ErrorCode.UNAUTHORIZED,
+        timestamp: new Date().toISOString(),
+      };
+      return res.send(noAuthResponse);
     }
 
     const decoded = await verifyJwtToken(token);
@@ -23,9 +27,12 @@ export const authMiddleware = async (
 
     next();
   } catch (error) {
-    if (error instanceof AppError) {
-      throw error;
-    }
-    throw new AppError("Invalid or expired token", ErrorCode.UNAUTHORIZED);
+    return res.send({
+      success: false,
+      message: "Invalid or expired token",
+      errors: [],
+      errorCode: ErrorCode.UNAUTHORIZED,
+      timestamp: new Date().toISOString(),
+    });
   }
 };
