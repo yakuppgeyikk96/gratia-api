@@ -8,11 +8,13 @@ import {
   clearCartController,
   getCartController,
   removeFromCartController,
+  syncCartController,
   updateCartItemController,
 } from "../controllers/cart.controller";
 import {
   addToCartSchema,
   removeFromCartParamsSchema,
+  syncCartSchema,
   updateCartItemSchema,
 } from "../validations/cart.validations";
 
@@ -23,6 +25,8 @@ router.get("/", getCartController);
 
 // POST /api/cart - Add item to cart
 router.post("/", validateBody(addToCartSchema), addToCartController);
+
+router.post("/sync", validateBody(syncCartSchema), syncCartController);
 
 // PUT /api/cart - Update cart item quantity
 router.put("/", validateBody(updateCartItemSchema), updateCartItemController);

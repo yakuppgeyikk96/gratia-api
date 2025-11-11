@@ -10,7 +10,7 @@ import {
   removeItemFromCart,
   updateCartItem,
 } from "../repositories/cart.repository";
-import { AddToCartDto, UpdateCartItemDto } from "../types";
+import { AddToCartDto, SyncCartDto, UpdateCartItemDto } from "../types";
 
 export const getCartService = async (userId: string): Promise<CartDoc> => {
   return await findOrCreateCart(userId);
@@ -124,4 +124,128 @@ export const clearCartService = async (userId: string): Promise<CartDoc> => {
     throw new AppError(CART_MESSAGES.CART_NOT_FOUND, ErrorCode.NOT_FOUND);
   }
   return cart;
+};
+
+export const syncCartService = async (
+  userId: string,
+  data: SyncCartDto
+): Promise<CartDoc> => {
+  const { items } = data;
+
+  // 1. Get or create cart
+  const cart = await findOrCreateCart(userId);
+
+  // 2. Validation results tracking
+  const validatedItems: Array<{
+    sku: string;
+    productId: string;
+    quantity: number;
+    product: any;
+  }> = [];
+
+  const errors: Array<{ sku: string; error: string }> = [];
+
+  // 3. Validate all items from frontend
+  for (const item of items) {
+    try {
+      // Validate product exists and is active
+      const product = await validateProductAndStock(
+        item.productId,
+        item.quantity
+      );
+
+      // Verify SKU matches
+      if (product.sku !== item.sku) {
+        errors.push({ sku: item.sku, error: CART_MESSAGES.INVALID_SKU });
+        continue;
+      }
+
+      validatedItems.push({
+        sku: item.sku,
+        productId: item.productId,
+        quantity: item.quantity,
+        product,
+      });
+    } catch (error: any) {
+      // Track validation errors but continue processing other items
+      errors.push({
+        sku: item.sku,
+        error: error.message || "Validation failed",
+      });
+    }
+  }
+
+  // 4. Create a map of frontend items by SKU
+  const frontendItemsMap = new Map<string, (typeof validatedItems)[0]>();
+  for (const validatedItem of validatedItems) {
+    frontendItemsMap.set(validatedItem.sku, validatedItem);
+  }
+
+  // 5. Merge strategy: Frontend items take priority, but merge quantities intelligently
+  const mergedItems = new Map<string, any>();
+
+  // First, add all existing cart items
+  for (const existingItem of cart.items) {
+    const frontendItem = frontendItemsMap.get(existingItem.sku);
+
+    if (frontendItem) {
+      // Item exists in both frontend and backend
+      // Use the maximum of frontend quantity and existing quantity (or sum, depending on business logic)
+      // For sync, we'll use frontend quantity as source of truth, but respect MAX_QUANTITY
+      const syncQuantity = Math.min(
+        frontendItem.quantity,
+        CART_LIMITS.MAX_QUANTITY_PER_ITEM
+      );
+
+      // Re-validate with sync quantity
+      try {
+        await validateProductAndStock(frontendItem.productId, syncQuantity);
+
+        // Build cart item with synced quantity
+        const cartItem = buildCartItem(frontendItem.product, syncQuantity);
+        mergedItems.set(existingItem.sku, cartItem);
+      } catch (error: any) {
+        // If sync quantity fails, keep existing item
+        mergedItems.set(existingItem.sku, existingItem);
+        errors.push({
+          sku: existingItem.sku,
+          error: `Could not sync quantity: ${error.message}`,
+        });
+      }
+    } else {
+      // Item exists only in backend - keep it
+      mergedItems.set(existingItem.sku, existingItem);
+    }
+  }
+
+  // 6. Add new items from frontend that don't exist in backend
+  for (const validatedItem of validatedItems) {
+    if (!mergedItems.has(validatedItem.sku)) {
+      // New item - add to cart
+      const cartItem = buildCartItem(
+        validatedItem.product,
+        validatedItem.quantity
+      );
+      mergedItems.set(validatedItem.sku, cartItem);
+    }
+  }
+
+  // 7. Check cart limits
+  if (mergedItems.size > CART_LIMITS.MAX_ITEMS) {
+    throw new AppError(
+      `Cart cannot contain more than ${CART_LIMITS.MAX_ITEMS} items`,
+      ErrorCode.BAD_REQUEST
+    );
+  }
+
+  // 8. Update cart with merged items
+  cart.items = Array.from(mergedItems.values()) as any;
+  const updatedCart = await cart.save();
+
+  // 9. Log errors if any
+  if (errors.length > 0) {
+    console.warn("Cart sync completed with errors:", errors);
+  }
+
+  return updatedCart;
 };

@@ -8,9 +8,10 @@ import {
   clearCartService,
   getCartService,
   removeFromCartService,
+  syncCartService,
   updateCartItemService,
 } from "../services/cart.services";
-import { AddToCartDto, UpdateCartItemDto } from "../types";
+import { AddToCartDto, SyncCartDto, UpdateCartItemDto } from "../types";
 
 export const getCartController = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -62,5 +63,16 @@ export const clearCartController = asyncHandler(
     const cart = await clearCartService(userId);
 
     returnSuccess(res, cart, CART_MESSAGES.CART_CLEARED, StatusCode.SUCCESS);
+  }
+);
+
+export const syncCartController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const userId = req.user!.userId;
+    const payload: SyncCartDto = req.body;
+
+    const cart = await syncCartService(userId, payload);
+
+    returnSuccess(res, cart, CART_MESSAGES.CART_SYNCED, StatusCode.SUCCESS);
   }
 );

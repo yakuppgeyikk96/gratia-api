@@ -5,6 +5,7 @@ export const CART_MESSAGES = {
   ITEM_UPDATED: "Cart item updated successfully",
   ITEM_REMOVED: "Item removed from cart successfully",
   CART_CLEARED: "Cart cleared successfully",
+  CART_SYNCED: "Cart synchronized successfully",
 
   // Error messages
   CART_NOT_FOUND: "Cart not found",
@@ -17,6 +18,8 @@ export const CART_MESSAGES = {
   CART_UPDATE_FAILED: "Failed to update cart",
   VARIANT_NOT_FOUND: "Product variant not found",
   MAX_QUANTITY_EXCEEDED: "Maximum quantity per item exceeded",
+  MAX_ITEMS_EXCEEDED: "Cannot sync more than 50 items at once",
+  SYNC_FAILED: "Failed to synchronize cart",
 };
 
 export const CART_LIMITS = {
