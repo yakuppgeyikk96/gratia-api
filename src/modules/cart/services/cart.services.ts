@@ -81,11 +81,17 @@ export const updateCartItemService = async (
     throw new AppError(CART_MESSAGES.ITEM_NOT_FOUND, ErrorCode.NOT_FOUND);
   }
 
-  // 2. Validate product and stock availability
+  // 2. If quantity is 0, remove item from cart
+  if (quantity === 0) {
+    return await removeFromCartService(userId, sku);
+  }
+
+  // 3. Validate product and stock availability (quantity > 0)
   await validateProductAndStock(existingItem.productId.toString(), quantity);
 
-  // 3. Update cart item
+  // 4. Update cart item
   const updatedCart = await updateCartItem(userId, sku, quantity);
+
   if (!updatedCart) {
     throw new AppError(
       CART_MESSAGES.CART_UPDATE_FAILED,

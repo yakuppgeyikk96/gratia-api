@@ -15,7 +15,7 @@ export const updateCartItemSchema = z.object({
   quantity: z
     .number()
     .int("Quantity must be an integer")
-    .min(1, "Quantity must be at least 1")
+    .min(0, "Quantity cannot be less than 0")
     .max(100, "Quantity cannot exceed 100"),
 });
 
@@ -32,7 +32,7 @@ export const syncCartSchema = z.object({
         quantity: z
           .number()
           .int("Quantity must be an integer")
-          .min(1, "Quantity must be at least 1")
+          .min(1, "Quantity cannot be less than 1")
           .max(100, "Quantity cannot exceed 100"),
       })
     )
