@@ -1,5 +1,5 @@
 import Category, { CategoryDoc } from "../../../shared/models/category.model";
-import CreateCategoryDto from "../types/CreateCategoryDto";
+import { CreateCategoryDto } from "../types";
 
 export const createCategory = async (
   categoryData: CreateCategoryDto

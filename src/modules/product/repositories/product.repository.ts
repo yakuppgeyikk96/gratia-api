@@ -59,7 +59,8 @@ export const findProducts = async (
   };
 
   if (categorySlug) {
-    query.categoryPath = new RegExp(`^${categorySlug.replace(/#/g, "#")}`);
+    const escapedSlug = categorySlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    query.categoryPath = new RegExp(`(^|#)${escapedSlug}(#|$)`);
   }
 
   if (collectionSlug) {
@@ -135,7 +136,8 @@ export const extractFilterOptions = async (
   const query: any = { isActive: true };
 
   if (categorySlug) {
-    query.categoryPath = new RegExp(`^${categorySlug.replace(/#/g, "#")}`);
+    const escapedSlug = categorySlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    query.categoryPath = new RegExp(`(^|#)${escapedSlug}(#|$)`);
   }
 
   if (collectionSlug) {

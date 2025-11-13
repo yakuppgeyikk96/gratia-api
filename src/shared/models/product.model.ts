@@ -214,7 +214,6 @@ const ProductSchema: Schema = new Schema(
     productGroupId: {
       type: String,
       required: true,
-      index: true,
     },
     metaTitle: {
       type: String,
@@ -246,8 +245,7 @@ ProductSchema.pre("save", function (next) {
 });
 
 // Indexes
-ProductSchema.index({ slug: 1 });
-ProductSchema.index({ sku: 1 });
+// slug ve sku için duplicate index'ler kaldırıldı (unique: true zaten index oluşturur)
 ProductSchema.index({ productGroupId: 1 });
 ProductSchema.index({ categoryId: 1 });
 ProductSchema.index({ categoryPath: 1 });

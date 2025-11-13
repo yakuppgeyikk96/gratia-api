@@ -1,4 +1,4 @@
-interface CreateCategoryDto {
+export interface CreateCategoryDto {
   name: string;
   slug: string;
   description?: string;
@@ -8,5 +8,3 @@ interface CreateCategoryDto {
   isActive?: boolean;
   sortOrder?: number;
 }
-
-export default CreateCategoryDto;

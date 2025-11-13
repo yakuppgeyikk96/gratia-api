@@ -13,7 +13,7 @@ import {
   getCategoryTreeService,
   getSubCategoriesService,
 } from "../services/category.services";
-import CreateCategoryDto from "../types/CreateCategoryDto";
+import { CategoryTreeNode, CreateCategoryDto } from "../types";
 
 export const createCategoryController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -126,7 +126,7 @@ export const getCategoryTreeController = asyncHandler(
   async (_req: Request, res: Response) => {
     const result = await getCategoryTreeService();
 
-    returnSuccess(
+    returnSuccess<CategoryTreeNode[]>(
       res,
       result,
       CATEGORY_MESSAGES.CATEGORIES_FOUND,

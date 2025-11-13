@@ -57,7 +57,6 @@ const CollectionSchema: Schema = new Schema(
   }
 );
 
-CollectionSchema.index({ slug: 1 });
 CollectionSchema.index({ collectionType: 1 });
 CollectionSchema.index({ isActive: 1 });
 

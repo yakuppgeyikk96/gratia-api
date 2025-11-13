@@ -64,7 +64,6 @@ const CategorySchema: Schema = new Schema(
   }
 );
 
-CategorySchema.index({ slug: 1 });
 CategorySchema.index({ parentId: 1 });
 CategorySchema.index({ level: 1 });
 CategorySchema.index({ isActive: 1 });

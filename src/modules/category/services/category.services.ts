@@ -10,7 +10,7 @@ import {
   findCategoriesByParentId,
   findCategoryById,
 } from "../repositories/category.repository";
-import CreateCategoryDto from "../types/CreateCategoryDto";
+import { CategoryTreeNode, CreateCategoryDto } from "../types";
 
 export const createCategoryService = async (
   data: CreateCategoryDto
@@ -95,10 +95,10 @@ export const getSubCategoriesService = async (
   return await findCategoriesByParentId(parentId);
 };
 
-export const getCategoryTreeService = async (): Promise<any[]> => {
+export const getCategoryTreeService = async (): Promise<CategoryTreeNode[]> => {
   const categories = await findAllCategories();
 
-  const buildTree = (parentId: string | null = null): any[] => {
+  const buildTree = (parentId: string | null = null): CategoryTreeNode[] => {
     return categories
       .filter((cat) => {
         if (parentId === null) {

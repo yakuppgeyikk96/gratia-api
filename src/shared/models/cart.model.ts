@@ -83,7 +83,6 @@ const CartSchema: Schema = new Schema(
       ref: "User",
       required: [true, "User ID is required"],
       unique: true,
-      index: true,
     },
     items: {
       type: [CartItemSchema],
@@ -106,7 +105,7 @@ const CartSchema: Schema = new Schema(
 );
 
 // Index for faster queries
-CartSchema.index({ userId: 1 });
+// userId için duplicate index kaldırıldı (unique: true zaten index oluşturur)
 CartSchema.index({ updatedAt: -1 });
 
 // Pre-save hook to calculate totals
