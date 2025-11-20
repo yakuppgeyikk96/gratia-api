@@ -163,6 +163,34 @@ export const seedDatabaseService = async (): Promise<SeedResult> => {
   }
 
   /**
+   * Helper function to get category-specific image seed
+   * Her kategori için farklı bir seed ID döndürür
+   */
+  const getCategoryImageSeed = (
+    categoryName: string,
+    color: string,
+    index: number
+  ): number => {
+    const categorySeeds: Record<string, number> = {
+      Jackets: 100,
+      "T-Shirts": 200,
+      Jeans: 300,
+      Sneakers: 400,
+      Boots: 500,
+      Sandals: 600,
+    };
+    const colorSeeds: Record<string, number> = {
+      black: 0,
+      white: 10,
+      red: 20,
+      blue: 30,
+    };
+    const baseSeed = categorySeeds[categoryName] || 0;
+    const colorSeed = colorSeeds[color] || 0;
+    return baseSeed + colorSeed + index;
+  };
+
+  /**
    * Create products (each variant is now a separate product)
    */
   const products: any[] = [];
@@ -204,8 +232,13 @@ export const seedDatabaseService = async (): Promise<SeedResult> => {
               const variantSlug = `${baseProductSlug}-${color}-${size.toLowerCase()}`;
               const variantSku = `SKU-${variantSlug.toUpperCase()}`;
 
+              // Color ve size bilgisini isme ekle
+              const variantName = `${baseProductName} - ${
+                color.charAt(0).toUpperCase() + color.slice(1)
+              } ${size}`;
+
               products.push({
-                name: baseProductName,
+                name: variantName,
                 slug: variantSlug,
                 description: `Premium quality ${baseProductName.toLowerCase()} with modern design. Available in ${color} color and ${size} size.`,
                 sku: variantSku,
@@ -219,7 +252,23 @@ export const seedDatabaseService = async (): Promise<SeedResult> => {
                   color,
                   size,
                 },
-                images: [],
+                images: [
+                  `https://picsum.photos/seed/${getCategoryImageSeed(
+                    level2Cat,
+                    color,
+                    1
+                  )}/800/800`,
+                  `https://picsum.photos/seed/${getCategoryImageSeed(
+                    level2Cat,
+                    color,
+                    2
+                  )}/800/800`,
+                  `https://picsum.photos/seed/${getCategoryImageSeed(
+                    level2Cat,
+                    color,
+                    3
+                  )}/800/800`,
+                ],
                 productGroupId,
                 isActive: true,
               });
