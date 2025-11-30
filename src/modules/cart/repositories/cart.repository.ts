@@ -40,7 +40,7 @@ export const addItemToCart = async (
 export const updateCartItem = async (
   userId: string,
   sku: string,
-  quantity: number
+  item: CartItem
 ): Promise<CartDoc | null> => {
   const cart = await Cart.findOne({ userId });
 
@@ -54,7 +54,8 @@ export const updateCartItem = async (
     return null;
   }
 
-  cart.items[itemIndex]!.quantity = quantity;
+  // Replace entire item to update price and other fields
+  cart.items[itemIndex] = item as any;
 
   // Save (triggers pre-save hook for totals calculation)
   return await cart.save();
@@ -68,6 +69,12 @@ export const removeItemFromCart = async (
 
   if (!cart) {
     return null;
+  }
+
+  // Check if item exists
+  const itemExists = cart.items.some((item) => item.sku === sku);
+  if (!itemExists) {
+    return null; // Item not found
   }
 
   // Remove item
