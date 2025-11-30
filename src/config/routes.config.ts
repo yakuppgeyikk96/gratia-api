@@ -2,6 +2,7 @@ import { Express, Router } from "express";
 import authRoutes from "../modules/auth/routes/auth.routes";
 import cartRoutes from "../modules/cart/routes/cart.routes";
 import categoryRoutes from "../modules/category/routes/category.routes";
+import checkoutRoutes from "../modules/checkout/routes/checkout.routes";
 import collectionRoutes from "../modules/collection/routes/collection.routes";
 import navigationRoutes from "../modules/navigation/routes/navigation.routes";
 import productRoutes from "../modules/product/routes/product.routes";
@@ -19,6 +20,9 @@ export const routesConfig = (app: Express) => {
   router.use("/products", productRoutes);
   router.use("/seed", seedRoutes);
   router.use("/navigation", navigationRoutes);
+
+  // Public routes (authenticated and guest users)
+  router.use("/checkout", checkoutRoutes);
 
   // Protected routes
   router.use("/cart", authMiddleware, cartRoutes);

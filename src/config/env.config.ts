@@ -3,7 +3,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const validateEnvironment = (): void => {
-  const required = ["MONGO_URI", "JWT_SECRET"];
+  const required = [
+    "MONGO_URI",
+    "JWT_SECRET",
+    "REDIS_HOST",
+    "REDIS_PORT",
+    "REDIS_USERNAME",
+    "REDIS_PASSWORD",
+  ];
 
   for (const key of required) {
     if (!process.env[key]) {
