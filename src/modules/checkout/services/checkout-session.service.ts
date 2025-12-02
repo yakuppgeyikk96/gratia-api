@@ -1,6 +1,7 @@
 import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import {
   deleteRedisValue,
+  getRedisKeyTTL,
   getRedisValue,
   setRedisValue,
 } from "../../../shared/services";
@@ -145,6 +146,7 @@ export const createCheckoutSessionService = async (
     orderId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    ttl: CHECKOUT_CONFIG.SESSION_TTL_SECONDS,
   };
 
   // Save to Redis with TTL
@@ -170,6 +172,8 @@ export const getCheckoutSessionService = async (
     redisKey
   );
 
+  const ttl = await getRedisKeyTTL(redisKey);
+
   // Validate session
   if (!session) {
     throw new AppError(
@@ -192,7 +196,10 @@ export const getCheckoutSessionService = async (
     );
   }
 
-  return session;
+  return {
+    ...session,
+    ttl,
+  };
 };
 
 /**

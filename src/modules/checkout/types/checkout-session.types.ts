@@ -50,6 +50,7 @@ export interface CheckoutSession {
   orderId: ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
+  ttl: number;
 }
 
 // Request DTOs
