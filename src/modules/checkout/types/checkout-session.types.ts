@@ -34,9 +34,6 @@ export interface CartSnapshot {
 // Checkout Session
 export interface CheckoutSession {
   sessionToken: string;
-  userId: ObjectId | null;
-  guestEmail: string | null;
-  cartId: ObjectId | null;
   currentStep: CheckoutStep;
   status: CheckoutStatus;
   shippingAddress: Address | null;
@@ -55,8 +52,7 @@ export interface CheckoutSession {
 
 // Request DTOs
 export interface CreateCheckoutSessionDto {
-  guestEmail?: string;
-  items?: {
+  items: {
     sku: string;
     quantity: number;
   }[];

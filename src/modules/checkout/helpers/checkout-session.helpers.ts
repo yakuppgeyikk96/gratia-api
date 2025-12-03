@@ -1,6 +1,9 @@
 import crypto from "crypto";
 import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
-import { CartDoc } from "../../../shared/models/cart.model";
+import { CartDoc, CartItem } from "../../../shared/models/cart.model";
+import { getRedisKeyTTL, getRedisValue } from "../../../shared/services";
+import { buildCartItem } from "../../cart/helpers/cart.helpers";
+import { findProductBySku } from "../../product/repositories/product.repository";
 import {
   CHECKOUT_CONFIG,
   CHECKOUT_MESSAGES,
@@ -178,4 +181,146 @@ export const canProceedToStep = (
   const requiredStepIndex = stepOrder.indexOf(requiredStep);
 
   return currentStepIndex >= requiredStepIndex;
+};
+
+/**
+ * Validates guest items and creates cart snapshot
+ * @param items - Guest cart items
+ * @returns Cart snapshot
+ */
+export const validateAndBuildGuestCartSnapshot = async (
+  items: { sku: string; quantity: number }[]
+): Promise<CartSnapshot> => {
+  const validatedItems: CartItem[] = [];
+
+  // Validate all items
+  for (const item of items) {
+    // Find product by SKU
+    const product = await findProductBySku(item.sku);
+
+    if (!product) {
+      throw new AppError(
+        `Product with SKU ${item.sku} not found`,
+        ErrorCode.NOT_FOUND
+      );
+    }
+
+    // Check if product is active
+    if (!product.isActive) {
+      throw new AppError(
+        `Product with SKU ${item.sku} is not active`,
+        ErrorCode.BAD_REQUEST
+      );
+    }
+
+    // Validate stock availability
+    if (product.stock < item.quantity) {
+      throw new AppError(
+        `Insufficient stock for product with SKU ${item.sku}`,
+        ErrorCode.BAD_REQUEST
+      );
+    }
+
+    // Build cart item
+    const cartItem = buildCartItem(product, item.quantity);
+    validatedItems.push(cartItem);
+  }
+
+  // Calculate subtotal
+  const subtotal = validatedItems.reduce((sum, item) => {
+    const itemPrice = item.discountedPrice ?? item.price;
+    return sum + itemPrice * item.quantity;
+  }, 0);
+
+  const totalItems = validatedItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
+  return {
+    items: validatedItems,
+    subtotal,
+    totalItems,
+  };
+};
+
+/**
+ * Gets session with TTL from Redis and validates it
+ * @param sessionToken - Session token
+ * @returns Session with updated TTL
+ */
+export const getSessionWithTTL = async (
+  sessionToken: string
+): Promise<CheckoutSession> => {
+  const redisKey = getSessionRedisKey(sessionToken);
+  const session: CheckoutSession | null = await getRedisValue<CheckoutSession>(
+    redisKey
+  );
+
+  // Validate session manually
+  if (!session) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.SESSION_NOT_FOUND,
+      ErrorCode.NOT_FOUND
+    );
+  }
+
+  if (isSessionExpired(session)) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.SESSION_EXPIRED,
+      ErrorCode.BAD_REQUEST
+    );
+  }
+
+  if (session.status === CheckoutStatus.COMPLETED) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.SESSION_ALREADY_COMPLETED,
+      ErrorCode.BAD_REQUEST
+    );
+  }
+
+  // Get TTL from Redis and update session
+  const ttl = await getRedisKeyTTL(redisKey);
+
+  return {
+    ...session,
+    ttl: ttl > 0 ? ttl : 0,
+  };
+};
+
+/**
+ * Updates pricing with shipping cost
+ * @param currentPricing - Current pricing
+ * @param shippingCost - Shipping cost
+ * @returns Updated pricing
+ */
+export const updatePricingWithShipping = (
+  currentPricing: CheckoutPricing,
+  shippingCost: number
+): CheckoutPricing => {
+  return {
+    ...currentPricing,
+    shippingCost,
+    total: currentPricing.subtotal + shippingCost - currentPricing.discount,
+  };
+};
+
+/**
+ * Validates checkout completion requirements
+ * @param session - Checkout session
+ */
+export const validateCheckoutCompletion = (session: CheckoutSession): void => {
+  if (!session.shippingAddress) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.SHIPPING_ADDRESS_REQUIRED,
+      ErrorCode.BAD_REQUEST
+    );
+  }
+
+  if (!session.shippingMethodId) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.SHIPPING_METHOD_REQUIRED,
+      ErrorCode.BAD_REQUEST
+    );
+  }
 };
