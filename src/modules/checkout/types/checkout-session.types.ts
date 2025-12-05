@@ -2,6 +2,7 @@ import { ObjectId } from "mongoose";
 import { CartItem } from "../../../shared/models/cart.model";
 import { Address } from "./address.types";
 import { CheckoutPricing } from "./pricing.types";
+import { ShippingMethod } from "./shipping.types";
 
 // Enums
 export enum CheckoutStep {
@@ -66,7 +67,6 @@ export interface UpdateShippingAddressDto {
 
 export interface SelectShippingMethodDto {
   shippingMethodId: string;
-  shippingCost?: number;
 }
 
 export interface CompletePaymentDto {
@@ -90,5 +90,5 @@ export interface CheckoutSessionWithMeta {
   session: CheckoutSession;
   isGuest: boolean;
   canResume: boolean;
-  availableShippingMethods?: any[]; // TODO: Define ShippingMethod type properly
+  availableShippingMethods?: ShippingMethod[];
 }

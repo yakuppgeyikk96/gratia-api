@@ -1,6 +1,10 @@
 import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import { deleteRedisValue, setRedisValue } from "../../../shared/services";
 import {
+  calculateShippingCost,
+  validateShippingMethodService,
+} from "../../shipping/services";
+import {
   CHECKOUT_CONFIG,
   CHECKOUT_MESSAGES,
 } from "../constants/checkout.constants";
@@ -162,8 +166,7 @@ export const updateShippingAddressService = async (
  */
 export const selectShippingMethodService = async (
   sessionToken: string,
-  shippingMethodId: string,
-  shippingCost: number
+  shippingMethodId: string
 ): Promise<CheckoutSession> => {
   const session = await getSessionWithTTL(sessionToken);
 
@@ -174,6 +177,15 @@ export const selectShippingMethodService = async (
       ErrorCode.BAD_REQUEST
     );
   }
+
+  // Validate and get shipping method
+  const method = await validateShippingMethodService(shippingMethodId);
+
+  // Calculate shipping cost (applies free shipping rules)
+  const shippingCost = calculateShippingCost(
+    method,
+    session.cartSnapshot.subtotal
+  );
 
   // Update pricing with shipping cost
   const updatedPricing = updatePricingWithShipping(

@@ -82,10 +82,6 @@ export const updateShippingAddressSchema = z.object({
 // Select Shipping Method Schema
 export const selectShippingMethodSchema = z.object({
   shippingMethodId: z.string().min(1, "Shipping method ID is required").trim(),
-  shippingCost: z
-    .number()
-    .min(0, "Shipping cost cannot be negative")
-    .optional(),
 });
 
 // Complete Payment Schema

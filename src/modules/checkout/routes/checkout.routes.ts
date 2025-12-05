@@ -4,6 +4,7 @@ import {
   completeCheckoutController,
   createCheckoutSessionController,
   getCheckoutSessionController,
+  getShippingMethodsController,
   selectShippingMethodController,
   updateShippingAddressController,
 } from "../controllers/checkout.controller";
@@ -53,6 +54,13 @@ router.post(
   validateParams(tokenParamsSchema),
   validateBody(completePaymentSchema),
   completeCheckoutController
+);
+
+// GET /api/checkout/session/:token/shipping-methods - Get available shipping methods
+router.get(
+  "/session/:token/shipping-methods",
+  validateParams(tokenParamsSchema),
+  getShippingMethodsController
 );
 
 export default router;

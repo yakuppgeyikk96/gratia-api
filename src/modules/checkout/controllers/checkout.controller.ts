@@ -1,7 +1,10 @@
 import { Response } from "express";
+import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import { asyncHandler } from "../../../shared/middlewares";
 import { AuthRequest, StatusCode } from "../../../shared/types";
 import { returnSuccess } from "../../../shared/utils/response.utils";
+import { getAvailableShippingMethodsService } from "../../shipping/services";
+import { CHECKOUT_MESSAGES } from "../constants/checkout.constants";
 import {
   completeCheckoutService,
   createCheckoutSessionService,
@@ -90,22 +93,16 @@ export const updateShippingAddressController = asyncHandler(
 export const selectShippingMethodController = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { token } = req.params;
-
     const payload: SelectShippingMethodDto = req.body;
 
-    // TODO: Get shipping method details (price, etc.) from shipping service
-    // For now, we'll need to pass shipping cost in the request
-    const shippingCost = payload.shippingCost || 0;
-
-    const session = await selectShippingMethodService(
+    const updatedSession = await selectShippingMethodService(
       token!,
-      payload.shippingMethodId,
-      shippingCost
+      payload.shippingMethodId
     );
 
     returnSuccess(
       res,
-      session,
+      updatedSession,
       "Shipping method selected successfully",
       StatusCode.SUCCESS
     );
@@ -139,6 +136,51 @@ export const completeCheckoutController = asyncHandler(
         session,
       },
       "Checkout completed successfully",
+      StatusCode.SUCCESS
+    );
+  }
+);
+
+/**
+ * Get available shipping methods for checkout session
+ * Public endpoint - works for both authenticated and guest users
+ */
+export const getShippingMethodsController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { token } = req.params;
+
+    // Get session to access shipping address and cart snapshot
+    const session = await getCheckoutSessionService(token!);
+
+    // Validate shipping address exists
+    if (!session.shippingAddress) {
+      throw new AppError(
+        CHECKOUT_MESSAGES.SHIPPING_ADDRESS_REQUIRED,
+        ErrorCode.BAD_REQUEST
+      );
+    }
+
+    // Get available shipping methods
+    const methods = await getAvailableShippingMethodsService(
+      session.shippingAddress,
+      session.cartSnapshot
+    );
+
+    // Transform to frontend format
+    const shippingMethods = methods.map((method) => ({
+      _id: method._id.toString(),
+      name: method.name,
+      carrier: method.carrier,
+      description: method.description,
+      estimatedDays: method.estimatedDays,
+      price: method.price,
+      isFree: method.isFree,
+    }));
+
+    returnSuccess(
+      res,
+      shippingMethods,
+      "Shipping methods retrieved successfully",
       StatusCode.SUCCESS
     );
   }

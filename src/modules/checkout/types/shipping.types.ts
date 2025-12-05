@@ -1,7 +1,5 @@
-import { ObjectId } from "mongoose";
-
 export interface ShippingMethod {
-  _id: ObjectId;
+  _id: string;
   name: string;
   carrier: string;
   description?: string;
