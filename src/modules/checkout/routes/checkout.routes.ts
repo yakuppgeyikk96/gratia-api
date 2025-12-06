@@ -1,10 +1,17 @@
 import { Router } from "express";
 import { validateBody, validateParams } from "../../../shared/middlewares";
 import {
+  countryCodeParamsSchema,
+  stateCodeParamsSchema,
+} from "../../location/validations/location.validations";
+import {
   completeCheckoutController,
   createCheckoutSessionController,
   getCheckoutSessionController,
+  getShippingCitiesOptionsController,
+  getShippingCountryOptionsController,
   getShippingMethodsController,
+  getShippingStatesOptionsController,
   selectShippingMethodController,
   updateShippingAddressController,
 } from "../controllers/checkout.controller";
@@ -61,6 +68,23 @@ router.get(
   "/session/:token/shipping-methods",
   validateParams(tokenParamsSchema),
   getShippingMethodsController
+);
+
+// GET /api/checkout/shipping-country-options - Get available shipping country options
+router.get("/shipping-country-options", getShippingCountryOptionsController);
+
+// GET /api/checkout/shipping-states-options - Get available shipping states options
+router.get(
+  "/shipping-states-options/:code",
+  validateParams(countryCodeParamsSchema),
+  getShippingStatesOptionsController
+);
+
+// GET /api/checkout/shipping-cities-options - Get available shipping cities options
+router.get(
+  "/shipping-cities-options/:countryCode/:stateCode",
+  validateParams(stateCodeParamsSchema),
+  getShippingCitiesOptionsController
 );
 
 export default router;

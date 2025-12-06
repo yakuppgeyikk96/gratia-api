@@ -3,6 +3,11 @@ import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import { asyncHandler } from "../../../shared/middlewares";
 import { AuthRequest, StatusCode } from "../../../shared/types";
 import { returnSuccess } from "../../../shared/utils/response.utils";
+import {
+  getAllCountriesService,
+  getCitiesByStateCodeService,
+  getStatesByCountryCodeService,
+} from "../../location/services/location.service";
 import { getAvailableShippingMethodsService } from "../../shipping/services";
 import { CHECKOUT_MESSAGES } from "../constants/checkout.constants";
 import {
@@ -181,6 +186,57 @@ export const getShippingMethodsController = asyncHandler(
       res,
       shippingMethods,
       "Shipping methods retrieved successfully",
+      StatusCode.SUCCESS
+    );
+  }
+);
+
+export const getShippingCountryOptionsController = asyncHandler(
+  async (_req: AuthRequest, res: Response) => {
+    const allCountries = await getAllCountriesService();
+
+    const availableCountries = allCountries.filter(
+      (country) => country.isAvailableForShipping
+    );
+
+    returnSuccess(
+      res,
+      availableCountries,
+      "Shipping country options retrieved successfully",
+      StatusCode.SUCCESS
+    );
+  }
+);
+
+export const getShippingStatesOptionsController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { code } = req.params;
+
+    const states = await getStatesByCountryCodeService(code!);
+
+    const availableStates = states.filter(
+      (state) => state.isAvailableForShipping
+    );
+
+    returnSuccess(
+      res,
+      availableStates,
+      "Shipping states options retrieved successfully",
+      StatusCode.SUCCESS
+    );
+  }
+);
+
+export const getShippingCitiesOptionsController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { countryCode, stateCode } = req.params;
+
+    const cities = await getCitiesByStateCodeService(countryCode!, stateCode!);
+
+    returnSuccess(
+      res,
+      cities,
+      "Shipping cities options retrieved successfully",
       StatusCode.SUCCESS
     );
   }

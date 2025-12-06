@@ -164,3 +164,38 @@ export const getCityByIdService = async (id: string): Promise<CityDoc> => {
 
   return city;
 };
+
+/**
+ * Gets all states for a country by country code
+ * @param code - Country code (e.g., "US", "TR")
+ * @returns Array of states
+ */
+export const getStatesByCountryCodeService = async (
+  code: string
+): Promise<StateDoc[]> => {
+  // Get country by code
+  const country = await getCountryByCodeService(code);
+
+  // Get states by country ID
+  return await findStatesByCountryId(country._id.toString());
+};
+
+/**
+ * Gets all cities for a state by country code and state code
+ * @param countryCode - Country code (e.g., "US", "TR")
+ * @param stateCode - State code (e.g., "CA", "IST")
+ * @returns Array of cities
+ */
+export const getCitiesByStateCodeService = async (
+  countryCode: string,
+  stateCode: string
+): Promise<CityDoc[]> => {
+  // Get country by code
+  const country = await getCountryByCodeService(countryCode);
+
+  // Get state by code within country
+  const state = await getStateByCodeService(country._id.toString(), stateCode);
+
+  // Get cities by state ID
+  return await findCitiesByStateId(state._id.toString());
+};

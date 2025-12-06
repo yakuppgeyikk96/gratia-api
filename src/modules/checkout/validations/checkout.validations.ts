@@ -35,14 +35,18 @@ export const addressSchema = z.object({
     .optional(),
   city: z
     .string()
-    .min(1, "City is required")
-    .max(100, "City cannot exceed 100 characters")
-    .trim(),
+    .min(2, "City code is required")
+    .max(10, "City code cannot exceed 10 characters")
+    .trim()
+    .regex(/^[A-Z0-9]+$/, "City code must be uppercase alphanumeric")
+    .transform((val) => val.toUpperCase()),
   state: z
     .string()
-    .min(1, "State is required")
-    .max(100, "State cannot exceed 100 characters")
-    .trim(),
+    .min(2, "State code is required")
+    .max(10, "State code cannot exceed 10 characters")
+    .trim()
+    .regex(/^[A-Z0-9]+$/, "State code must be uppercase alphanumeric")
+    .transform((val) => val.toUpperCase()),
   postalCode: z
     .string()
     .min(1, "Postal code is required")
@@ -50,9 +54,11 @@ export const addressSchema = z.object({
     .trim(),
   country: z
     .string()
-    .min(1, "Country is required")
-    .max(100, "Country cannot exceed 100 characters")
-    .trim(),
+    .min(2, "Country code is required")
+    .length(2, "Country code must be 2 characters")
+    .trim()
+    .regex(/^[A-Z]{2}$/, "Country code must be 2 uppercase letters")
+    .transform((val) => val.toUpperCase()),
 });
 
 // Create Checkout Session Schema

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 import { CartItem } from "../../../shared/models/cart.model";
-import { Address } from "./address.types";
+import { Address } from "../../../shared/types";
 import { CheckoutPricing } from "./pricing.types";
 import { ShippingMethod } from "./shipping.types";
 

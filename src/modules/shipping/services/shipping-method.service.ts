@@ -1,6 +1,6 @@
 import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
 import { ShippingMethodDoc } from "../../../shared/models/shipping-method.model";
-import { Address } from "../../checkout/types/address.types";
+import { Address } from "../../../shared/types";
 import { CartSnapshot } from "../../checkout/types/checkout-session.types";
 import { SHIPPING_MESSAGES } from "../constants/shipping.constants";
 import {

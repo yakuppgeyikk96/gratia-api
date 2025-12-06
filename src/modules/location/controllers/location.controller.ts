@@ -4,8 +4,10 @@ import { StatusCode } from "../../../shared/types/api.types";
 import { returnSuccess } from "../../../shared/utils/response.utils";
 import {
   getAllCountriesService,
+  getCitiesByStateCodeService,
   getCitiesByStateService,
   getCountryByCodeService,
+  getStatesByCountryCodeService,
   getStatesByCountryService,
 } from "../services/location.service";
 
@@ -73,6 +75,44 @@ export const getCitiesByStateController = asyncHandler(
     const { stateId } = req.params;
 
     const cities = await getCitiesByStateService(stateId!);
+
+    returnSuccess(
+      res,
+      cities,
+      "Cities retrieved successfully",
+      StatusCode.SUCCESS
+    );
+  }
+);
+
+/**
+ * Get all states for a country by country code
+ * Public endpoint
+ */
+export const getStatesByCountryCodeController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { code } = req.params;
+
+    const states = await getStatesByCountryCodeService(code!);
+
+    returnSuccess(
+      res,
+      states,
+      "States retrieved successfully",
+      StatusCode.SUCCESS
+    );
+  }
+);
+
+/**
+ * Get all cities for a state by country code and state code
+ * Public endpoint
+ */
+export const getCitiesByStateCodeController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { countryCode, stateCode } = req.params;
+
+    const cities = await getCitiesByStateCodeService(countryCode!, stateCode!);
 
     returnSuccess(
       res,
