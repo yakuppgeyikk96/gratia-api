@@ -4,6 +4,7 @@ import cartRoutes from "../modules/cart/routes/cart.routes";
 import categoryRoutes from "../modules/category/routes/category.routes";
 import checkoutRoutes from "../modules/checkout/routes/checkout.routes";
 import collectionRoutes from "../modules/collection/routes/collection.routes";
+import locationRoutes from "../modules/location/routes/location.routes";
 import navigationRoutes from "../modules/navigation/routes/navigation.routes";
 import productRoutes from "../modules/product/routes/product.routes";
 import seedRoutes from "../modules/seed/routes/seed.routes";
@@ -23,6 +24,7 @@ export const routesConfig = (app: Express) => {
 
   // Public routes (authenticated and guest users)
   router.use("/checkout", checkoutRoutes);
+  router.use("/location", locationRoutes);
 
   // Protected routes
   router.use("/cart", authMiddleware, cartRoutes);
