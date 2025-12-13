@@ -11,6 +11,7 @@ export interface ShippingMethodDoc extends Document {
   isActive: boolean;
   minOrderAmount?: number;
   availableCountries?: string[];
+  imageUrl?: string;
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
@@ -60,6 +61,10 @@ const ShippingMethodSchema: Schema = new Schema(
     availableCountries: {
       type: [String],
       default: [],
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
     },
     sortOrder: {
       type: Number,

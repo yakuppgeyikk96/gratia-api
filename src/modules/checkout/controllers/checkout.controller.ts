@@ -30,11 +30,8 @@ import {
  */
 export const createCheckoutSessionController = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.userId;
     const payload: CreateCheckoutSessionDto = req.body;
 
-    // For authenticated users, get cart from database
-    // For guest users, use items from request body
     const result = await createCheckoutSessionService(payload.items);
 
     returnSuccess(
@@ -180,6 +177,7 @@ export const getShippingMethodsController = asyncHandler(
       estimatedDays: method.estimatedDays,
       price: method.price,
       isFree: method.isFree,
+      imageUrl: method.imageUrl,
     }));
 
     returnSuccess(
