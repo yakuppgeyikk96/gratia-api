@@ -6,6 +6,7 @@ import { returnSuccess } from "../../../shared/utils/response.utils";
 import { PRODUCT_MESSAGES } from "../constants/product.constants";
 import {
   createProductService,
+  getFeaturedProductsService,
   getProductByIdService,
   getProductsService,
   getProductWithVariantsService,
@@ -137,5 +138,17 @@ export const getProductWithVariantsController = asyncHandler(
       PRODUCT_MESSAGES.PRODUCT_FOUND,
       StatusCode.SUCCESS
     );
+  }
+);
+
+export const getFeaturedProductsController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const limit = Number(req.query.limit) || 10;
+
+    const clampedLimit = Math.min(Math.max(limit, 8), 12);
+
+    const products = await getFeaturedProductsService(clampedLimit);
+
+    returnSuccess(res, products, PRODUCT_MESSAGES.PRODUCTS_FOUND);
   }
 );

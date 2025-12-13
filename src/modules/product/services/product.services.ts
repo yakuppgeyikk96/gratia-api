@@ -13,6 +13,7 @@ import {
   findProducts,
   findProductsByGroupId,
 } from "../repositories";
+import { findFeaturedProducts } from "../repositories/product.repository";
 import CreateProductDto from "../types/CreateProductDto";
 import ProductQueryOptionsDto from "../types/ProductQueryOptionsDto";
 import ProductsResponseDto from "../types/ProductsResponseDto";
@@ -182,4 +183,11 @@ export const getProductWithVariantsService = async (
     variants,
     availableOptions,
   };
+};
+
+export const getFeaturedProductsService = async (
+  limit: number = 10
+): Promise<ProductDoc[]> => {
+  const products = await findFeaturedProducts(limit);
+  return products;
 };

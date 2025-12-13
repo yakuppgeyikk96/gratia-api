@@ -210,3 +210,15 @@ export const findProductsByGroupId = async (
     isActive: true,
   }).sort({ "attributes.color": 1, "attributes.size": 1 });
 };
+
+export const findFeaturedProducts = async (
+  limit: number = 10
+): Promise<ProductDoc[]> => {
+  return await Product.find({
+    isActive: true,
+    isFeatured: true,
+  })
+    .sort({ featuredOrder: 1, createdAt: -1 })
+    .limit(limit)
+    .exec();
+};

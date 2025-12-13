@@ -2,6 +2,7 @@ import { Router } from "express";
 import { validateBody } from "../../../shared/middlewares/validation.middleware";
 import {
   createProductController,
+  getFeaturedProductsController,
   getProductByIdController,
   getProductsController,
   getProductWithVariantsController,
@@ -12,6 +13,9 @@ const router: Router = Router();
 
 // POST /api/products - Create product
 router.post("/", validateBody(createProductSchema), createProductController);
+
+// GET /api/products/featured - Get featured products
+router.get("/featured", getFeaturedProductsController);
 
 // GET /api/products - Get products
 router.get("/", getProductsController);

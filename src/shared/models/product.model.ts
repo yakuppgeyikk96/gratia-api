@@ -83,6 +83,8 @@ export interface ProductDoc {
   metaTitle?: string;
   metaDescription?: string;
   isActive: boolean;
+  isFeatured?: boolean;
+  featuredOrder?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -229,6 +231,15 @@ const ProductSchema: Schema = new Schema(
       type: Boolean,
       default: true,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+    featuredOrder: {
+      type: Number,
+      default: 0,
+      min: [0, "Featured order cannot be negative"],
+    },
   },
   {
     timestamps: true,
@@ -258,5 +269,7 @@ ProductSchema.index({ "attributes.material": 1 });
 // Compound index for common filter combinations
 ProductSchema.index({ "attributes.color": 1, "attributes.size": 1, price: 1 });
 ProductSchema.index({ categoryId: 1, price: 1 });
+ProductSchema.index({ isFeatured: 1, featuredOrder: 1 });
+ProductSchema.index({ isActive: 1, isFeatured: 1 });
 
 export default mongoose.model<ProductDoc>("Product", ProductSchema);
