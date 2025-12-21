@@ -1,4 +1,5 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import { Address } from "../types";
 import { CartItem } from "./cart.model";
 
 export enum OrderStatus {
@@ -23,30 +24,8 @@ export interface OrderDoc extends Document {
   userId?: ObjectId;
   email: string;
   items: CartItem[];
-  shippingAddress: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    email: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  };
-  billingAddress: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    email: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  };
+  shippingAddress: Address;
+  billingAddress: Address;
   shippingMethodId: ObjectId;
   paymentMethodType: string;
   paymentIntentId?: string;
