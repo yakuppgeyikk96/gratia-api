@@ -120,22 +120,17 @@ export const completeCheckoutController = asyncHandler(
     const { token } = req.params;
     const payload: CompletePaymentDto = req.body;
 
-    // TODO: Process payment and create order
-    // For now, we'll use a placeholder order ID
-    const orderId = "order_placeholder_" + Date.now();
-
-    const session = await completeCheckoutService(
+    const createdOrder = await completeCheckoutService(
       token!,
       payload.paymentMethodType,
-      orderId
+      payload.paymentToken
     );
 
     returnSuccess(
       res,
       {
-        orderId: session.orderId,
-        orderNumber: orderId, // TODO: Generate proper order number
-        session,
+        orderId: createdOrder._id,
+        orderNumber: createdOrder.orderNumber,
       },
       "Checkout completed successfully",
       StatusCode.SUCCESS

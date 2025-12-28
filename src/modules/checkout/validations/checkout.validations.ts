@@ -91,21 +91,35 @@ export const selectShippingMethodSchema = z.object({
 });
 
 // Complete Payment Schema
-export const completePaymentSchema = z.object({
-  paymentMethodType: z.enum(
-    ["credit_card", "bank_transfer", "cash_on_delivery"],
+export const completePaymentSchema = z
+  .object({
+    paymentMethodType: z.enum(
+      ["credit_card", "bank_transfer", "cash_on_delivery"],
+      {
+        message:
+          "Payment method must be credit_card, bank_transfer, or cash_on_delivery",
+      }
+    ),
+    paymentToken: z.string().trim().optional(),
+    notes: z
+      .string()
+      .max(500, "Notes cannot exceed 500 characters")
+      .trim()
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      // paymentToken is required only for credit_card
+      if (data.paymentMethodType === "credit_card") {
+        return data.paymentToken && data.paymentToken.length > 0;
+      }
+      return true;
+    },
     {
-      message:
-        "Payment method must be credit_card, bank_transfer, or cash_on_delivery",
+      message: "Payment token is required for credit card payments",
+      path: ["paymentToken"],
     }
-  ),
-  paymentToken: z.string().trim().optional(),
-  notes: z
-    .string()
-    .max(500, "Notes cannot exceed 500 characters")
-    .trim()
-    .optional(),
-});
+  );
 
 // Token Params Schema
 export const tokenParamsSchema = z.object({

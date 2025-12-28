@@ -1,6 +1,7 @@
 import { ObjectId } from "mongoose";
 import { CartItem } from "../../../shared/models/cart.model";
 import { Address } from "../../../shared/types";
+import { OrderNumber } from "./order.types";
 import { CheckoutPricing } from "./pricing.types";
 import { ShippingMethod } from "./shipping.types";
 
@@ -45,7 +46,7 @@ export interface CheckoutSession {
   pricing: CheckoutPricing;
   expiresAt: Date;
   completedAt: Date | null;
-  orderId: ObjectId | null;
+  orderNumber: OrderNumber | null;
   createdAt: Date;
   updatedAt: Date;
   ttl: number;
@@ -71,7 +72,7 @@ export interface SelectShippingMethodDto {
 
 export interface CompletePaymentDto {
   paymentMethodType: PaymentMethodType;
-  paymentToken?: string;
+  paymentToken: string;
   notes?: string;
 }
 

@@ -1,5 +1,11 @@
 import { AppError, ErrorCode } from "../../../shared/errors/base.errors";
-import { deleteRedisValue, setRedisValue } from "../../../shared/services";
+import { OrderDoc } from "../../../shared/models/order.model";
+import {
+  confirmPaymentIntent,
+  createPaymentIntent,
+  deleteRedisValue,
+  setRedisValue,
+} from "../../../shared/services";
 import {
   calculateShippingCost,
   validateShippingMethodService,
@@ -18,12 +24,15 @@ import {
   validateAndBuildGuestCartSnapshot,
   validateCheckoutCompletion,
 } from "../helpers";
+import { generateOrderNumber } from "../helpers/order.helpers";
 import {
   CheckoutSession,
   CheckoutStatus,
   CheckoutStep,
   CreateCheckoutSessionResponse,
+  PaymentMethodType,
 } from "../types";
+import { createOrderFromSession } from "./order.service";
 
 /**
  * Creates a new checkout session from selected items
@@ -61,7 +70,7 @@ export const createCheckoutSessionService = async (
     pricing,
     expiresAt,
     completedAt: null,
-    orderId: null,
+    orderNumber: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ttl: CHECKOUT_CONFIG.SESSION_TTL_SECONDS,
@@ -211,21 +220,77 @@ export const selectShippingMethodService = async (
  */
 export const completeCheckoutService = async (
   sessionToken: string,
-  paymentMethodType: any,
-  orderId: string
-): Promise<CheckoutSession> => {
-  const session = await getSessionWithTTL(sessionToken);
+  paymentMethodType: PaymentMethodType,
+  paymentToken: string
+): Promise<OrderDoc> => {
+  /* Generate order number to be used for the order follow-up */
+  const orderNumber = generateOrderNumber();
 
-  // Validate all required fields
+  /* Get the session from the database */
+  const session = await getCheckoutSessionService(sessionToken);
+
+  /* Validate if session is valid */
   validateCheckoutCompletion(session);
 
-  const updates: Partial<CheckoutSession> = {
+  let paymentIntentId: string | undefined;
+
+  if (paymentMethodType === PaymentMethodType.CREDIT_CARD) {
+    if (!paymentToken) {
+      throw new AppError(
+        CHECKOUT_MESSAGES.PAYMENT_TOKEN_REQUIRED,
+        ErrorCode.BAD_REQUEST
+      );
+    }
+
+    const paymentIntent = await createPaymentIntent(
+      session.pricing.total,
+      "usd",
+      {
+        sessionToken: session.sessionToken,
+      }
+    );
+
+    const confirmedPaymentIntent = await confirmPaymentIntent(
+      paymentIntent.id,
+      paymentToken
+    );
+
+    paymentIntentId = confirmedPaymentIntent.id;
+  } else if (paymentMethodType === PaymentMethodType.BANK_TRANSFER) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.BANK_TRANSFER_NOT_SUPPORTED,
+      ErrorCode.BAD_REQUEST
+    );
+  } else if (paymentMethodType === PaymentMethodType.CASH_ON_DELIVERY) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.CASH_ON_DELIVERY_NOT_SUPPORTED,
+      ErrorCode.BAD_REQUEST
+    );
+  }
+
+  const completedSession: CheckoutSession = {
+    ...session,
     paymentMethodType,
-    orderId: orderId as any,
+    orderNumber,
     status: CheckoutStatus.COMPLETED,
     currentStep: CheckoutStep.COMPLETED,
     completedAt: new Date(),
   };
 
-  return await updateCheckoutSessionService(sessionToken, updates);
+  /**
+   * Create order from session
+   */
+  const order = await createOrderFromSession(completedSession, paymentIntentId);
+
+  if (!order) {
+    throw new AppError(
+      CHECKOUT_MESSAGES.ORDER_CREATION_FAILED,
+      ErrorCode.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  /* Remove session from Redis after order is created */
+  await deleteCheckoutSessionService(sessionToken);
+
+  return order;
 };

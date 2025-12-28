@@ -28,6 +28,10 @@ export const CHECKOUT_MESSAGES = {
   SHIPPING_ADDRESS_REQUIRED: "Shipping address is required",
   SHIPPING_METHOD_REQUIRED: "Shipping method is required",
   PAYMENT_METHOD_REQUIRED: "Payment method is required",
+  BANK_TRANSFER_NOT_SUPPORTED: "Bank transfer is not supported",
+  CASH_ON_DELIVERY_NOT_SUPPORTED: "Cash on delivery is not supported",
+  ORDER_CREATION_FAILED: "Failed to create order",
+  PAYMENT_TOKEN_REQUIRED: "Payment token is required",
 };
 
 /**

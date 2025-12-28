@@ -17,13 +17,10 @@ export const createOrderFromSession = async (
   session: CheckoutSession,
   paymentIntentId?: string
 ): Promise<OrderDoc> => {
-  // Find user by email (if exists)
   const userId = await findUserIdByEmail(session.shippingAddress!.email!);
 
-  // Generate unique order number (timestamp + crypto random ensures uniqueness)
   const orderNumber = generateOrderNumber();
 
-  // Map session to order data
   const orderData = mapCheckoutSessionToOrder(
     session,
     orderNumber,
@@ -31,7 +28,6 @@ export const createOrderFromSession = async (
     paymentIntentId
   );
 
-  // Create and save order
   const order = new Order(orderData);
   return await order.save();
 };
